@@ -1,0 +1,15 @@
+.idea/
+*.iml
+
+
+# app
+/app/.vscode/
+/app/node_modules/
+/app/out/
+
+
+# kernel
+
+
+# release
+/release/
