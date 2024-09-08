@@ -1,25 +1,41 @@
 package main
 
 import (
-  "fmt"
+	"github.com/gin-gonic/gin"
+	"kernel/model"
+	"kernel/server"
+	"kernel/sql"
+	"kernel/util"
 )
 
-//TIP To run your code, right-click the code and select <b>Run</b>. Alternatively, click
-// the <icon src="AllIcons.Actions.Execute"/> icon in the gutter and select the <b>Run</b> menu item from here.
-
 func main() {
-  //TIP Press <shortcut actionId="ShowIntentionActions"/> when your caret is at the underlined or highlighted text
-  // to see how GoLand suggests fixing it.
-  s := "gopher"
-  fmt.Println("Hello and welcome, %s!", s)
 
-  for i := 1; i <= 5; i++ {
-	//TIP You can try debugging your code. We have set one <icon src="AllIcons.Debugger.Db_set_breakpoint"/> breakpoint
-	// for you, but you can always add more by pressing <shortcut actionId="ToggleLineBreakpoint"/>. To start your debugging session, 
-	// right-click your code in the editor and select the <b>Debug</b> option. 
-	fmt.Println("i =", 100/i)
-  }
+	util.Boot()
+	_ = sql.InitDatabase(false)
+	model.InitConf()
+	server.Start()
+
+	engine := gin.Default()
+	engine.GET("/start", func(c *gin.Context) {
+		server.Start()
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+	engine.GET("/stop", func(c *gin.Context) {
+		server.Stop()
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+	engine.GET("/restart", func(c *gin.Context) {
+		server.Restart()
+		c.JSON(200, gin.H{
+			"message": "pong",
+		})
+	})
+	engine.Run(":8080")
+
+	a := make(chan string)
+	a <- "exit"
 }
-
-//TIP See GoLand help at <a href="https://www.jetbrains.com/help/go/">jetbrains.com/help/go/</a>.
-// Also, you can try interactive lessons for GoLand by selecting 'Help | Learn IDE Features' from the main menu.

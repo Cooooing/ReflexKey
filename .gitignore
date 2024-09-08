@@ -9,6 +9,8 @@
 
 
 # kernel
+/kernel/log/
+/kernel/workspace/
 
 
 # release
