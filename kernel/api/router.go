@@ -8,5 +8,7 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.NoRoute(notFound)
 
 	ginServer.Handle("GET", "/api/system/ping", ping)
+	ginServer.Handle("GET", "/api/system/db", db)
+	ginServer.Handle("GET", "/api/system/db1", db1)
 
 }

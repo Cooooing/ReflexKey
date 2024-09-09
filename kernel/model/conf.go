@@ -2,7 +2,7 @@ package model
 
 import (
 	"golang.org/x/mod/semver"
-	"kernel/common/log"
+	"kernel/common"
 	"kernel/conf"
 	"kernel/util"
 	"sync"
@@ -59,10 +59,10 @@ func InitConf() {
 		}
 	} else {
 		if 0 < semver.Compare("v"+conf.VERSION, "v"+Conf.System.KernelVersion) {
-			log.Info("upgraded from version [%s] to [%s]", Conf.System.KernelVersion, conf.VERSION)
+			common.Info("upgraded from version [%s] to [%s]", Conf.System.KernelVersion, conf.VERSION)
 			Conf.ShowChangelog = true
 		} else if 0 > semver.Compare("v"+conf.VERSION, "v"+Conf.System.KernelVersion) {
-			log.Info("downgraded from version [%s] to [%s]", Conf.System.KernelVersion, conf.VERSION)
+			common.Info("downgraded from version [%s] to [%s]", Conf.System.KernelVersion, conf.VERSION)
 		}
 
 		Conf.System.KernelVersion = conf.VERSION

@@ -4,8 +4,6 @@ import (
 	"flag"
 	"github.com/gofrs/flock"
 	"kernel/common"
-	"kernel/common/file"
-	"kernel/common/log"
 	"kernel/conf"
 	"net/http"
 	"net/url"
@@ -89,7 +87,7 @@ func Boot() {
 	tryLockWorkspace()
 
 	bootBanner := figure.NewColorFigure(conf.NAME, "isometric3", "green", true)
-	log.Info("\n" + bootBanner.String())
+	common.Info("\n" + bootBanner.String())
 	logBootInfo()
 }
 
@@ -99,51 +97,51 @@ func initWorkspaceDir(workspaceArg string) {
 	TempDir = filepath.Join(WorkspaceDir, "temp")
 	LogPath = filepath.Join(TempDir, "log", "ReflexKey.log")
 	DBPath = filepath.Join(DataDir, DBName)
-	log.SetLogPath(LogPath)
+	common.SetLogPath(LogPath)
 
-	if !file.IsExist(WorkspaceDir) {
+	if !common.IsExist(WorkspaceDir) {
 		if err := os.MkdirAll(WorkspaceDir, 0755); nil != err && !os.IsExist(err) {
-			log.Error("create default workspace folder [%s] failed: %s", WorkspaceDir, err)
-			os.Exit(log.ExitCodeInitWorkspaceErr)
+			common.Error("create default workspace folder [%s] failed: %s", WorkspaceDir, err)
+			os.Exit(common.ExitCodeInitWorkspaceErr)
 		}
 	}
-	log.Info("use the workspace [%s]", WorkspaceDir)
+	common.Info("use the workspace [%s]", WorkspaceDir)
 
 	if err := os.MkdirAll(DataDir, 0755); nil != err && !os.IsExist(err) {
-		log.Fatal(log.ExitCodeInitWorkspaceErr, "create data folder [%s] failed: %s", DataDir, err)
+		common.Fatal(common.ExitCodeInitWorkspaceErr, "create data folder [%s] failed: %s", DataDir, err)
 	}
 	if err := os.MkdirAll(TempDir, 0755); nil != err && !os.IsExist(err) {
-		log.Fatal(log.ExitCodeInitWorkspaceErr, "create temp folder [%s] failed: %s", TempDir, err)
+		common.Fatal(common.ExitCodeInitWorkspaceErr, "create temp folder [%s] failed: %s", TempDir, err)
 	}
 
 	assets := filepath.Join(DataDir, "assets")
 	if err := os.MkdirAll(assets, 0755); nil != err && !os.IsExist(err) {
-		log.Fatal(log.ExitCodeInitWorkspaceErr, "create data assets folder [%s] failed: %s", assets, err)
+		common.Fatal(common.ExitCodeInitWorkspaceErr, "create data assets folder [%s] failed: %s", assets, err)
 	}
 
 	templates := filepath.Join(DataDir, "templates")
 	if err := os.MkdirAll(templates, 0755); nil != err && !os.IsExist(err) {
-		log.Fatal(log.ExitCodeInitWorkspaceErr, "create data templates folder [%s] failed: %s", templates, err)
+		common.Fatal(common.ExitCodeInitWorkspaceErr, "create data templates folder [%s] failed: %s", templates, err)
 	}
 
 	widgets := filepath.Join(DataDir, "widgets")
 	if err := os.MkdirAll(widgets, 0755); nil != err && !os.IsExist(err) {
-		log.Fatal(log.ExitCodeInitWorkspaceErr, "create data widgets folder [%s] failed: %s", widgets, err)
+		common.Fatal(common.ExitCodeInitWorkspaceErr, "create data widgets folder [%s] failed: %s", widgets, err)
 	}
 
 	plugins := filepath.Join(DataDir, "plugins")
 	if err := os.MkdirAll(plugins, 0755); nil != err && !os.IsExist(err) {
-		log.Fatal(log.ExitCodeInitWorkspaceErr, "create data plugins folder [%s] failed: %s", widgets, err)
+		common.Fatal(common.ExitCodeInitWorkspaceErr, "create data plugins folder [%s] failed: %s", widgets, err)
 	}
 
 	emojis := filepath.Join(DataDir, "emojis")
 	if err := os.MkdirAll(emojis, 0755); nil != err && !os.IsExist(err) {
-		log.Fatal(log.ExitCodeInitWorkspaceErr, "create data emojis folder [%s] failed: %s", widgets, err)
+		common.Fatal(common.ExitCodeInitWorkspaceErr, "create data emojis folder [%s] failed: %s", widgets, err)
 	}
 
 	public := filepath.Join(DataDir, "public")
 	if err := os.MkdirAll(public, 0755); nil != err && !os.IsExist(err) {
-		log.Fatal(log.ExitCodeInitWorkspaceErr, "create data public folder [%s] failed: %s", widgets, err)
+		common.Fatal(common.ExitCodeInitWorkspaceErr, "create data public folder [%s] failed: %s", widgets, err)
 	}
 }
 
@@ -154,20 +152,20 @@ func tryLockWorkspace() {
 		return
 	}
 	if nil != err {
-		log.Error("lock workspace [%s] failed: %s", WorkspaceDir, err)
+		common.Error("lock workspace [%s] failed: %s", WorkspaceDir, err)
 	} else {
-		log.Error("lock workspace [%s] failed", WorkspaceDir)
+		common.Error("lock workspace [%s] failed", WorkspaceDir)
 	}
-	os.Exit(log.ExitCodeWorkspaceLocked)
+	os.Exit(common.ExitCodeWorkspaceLocked)
 }
 
 func IsWorkspaceLocked(workspacePath string) bool {
-	if !file.IsDir(workspacePath) {
+	if !common.IsDir(workspacePath) {
 		return false
 	}
 
 	lockFilePath := filepath.Join(workspacePath, ".lock")
-	if !file.IsExist(lockFilePath) {
+	if !common.IsExist(lockFilePath) {
 		return false
 	}
 
@@ -188,19 +186,19 @@ func UnlockWorkspace() {
 	}
 
 	if err := WorkspaceLock.Unlock(); nil != err {
-		log.Error("unlock workspace [%s] failed: %s", WorkspaceDir, err)
+		common.Error("unlock workspace [%s] failed: %s", WorkspaceDir, err)
 		return
 	}
 
 	if err := os.Remove(filepath.Join(WorkspaceDir, ".lock")); nil != err {
-		log.Error("remove workspace lock failed: %s", err)
+		common.Error("remove workspace lock failed: %s", err)
 		return
 	}
 }
 
 func logBootInfo() {
 	plat := common.GetOSPlatform()
-	log.Info("kernel is booting:\n"+
+	common.Info("kernel is booting:\n"+
 		"    * ver [%s]\n"+
 		"    * arch [%s]\n"+
 		"    * os [%s]\n"+

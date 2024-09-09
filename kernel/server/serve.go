@@ -7,7 +7,7 @@ import (
 	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"kernel/api"
-	"kernel/common/log"
+	"kernel/common"
 	"kernel/middlewares"
 	"kernel/model"
 	"kernel/util"
@@ -47,22 +47,22 @@ func Start() {
 
 	ln, err := net.Listen("tcp", host+":"+util.ServerPort)
 	if nil != err {
-		log.Error("boot kernel failed: %s", err)
+		common.Error("boot kernel failed: %s", err)
 	}
 
 	_, port, err := net.SplitHostPort(ln.Addr().String())
 	if nil != err {
-		log.Error("boot kernel failed: %s", err)
+		common.Error("boot kernel failed: %s", err)
 	}
 	util.ServerPort = port
 
 	util.ServerURL, err = url.Parse("http://127.0.0.1:" + port)
 	if err != nil {
-		log.Error("parse server url failed: %s", err)
+		common.Error("parse server url failed: %s", err)
 	}
 
 	pid := fmt.Sprintf("%d", os.Getpid())
-	log.Info("kernel [pid=%s] http server [%s] is booting", pid, host+":"+port)
+	common.Info("kernel [pid=%s] http server [%s] is booting", pid, host+":"+port)
 	//util.HttpServing = true
 
 	//go util.HookUILoaded()
@@ -82,16 +82,16 @@ func Start() {
 	go func() {
 		if err = util.Server.Serve(ln); nil != err && !errors.Is(http.ErrServerClosed, err) {
 			util.ServerIsRunning = false
-			log.Error("boot kernel failed: %s", err)
+			common.Error("boot kernel failed: %s", err)
 		}
 	}()
 
 	util.ServerIsRunning = true
-	log.Info("http server started")
+	common.Info("http server started")
 }
 
 func Stop() {
-	log.Info("shutdown server ...")
+	common.Info("shutdown server ...")
 
 	// 创建一个 5 秒的超时上下文
 	ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -100,10 +100,10 @@ func Stop() {
 	// 关闭 HTTP Server
 	// 5秒内优雅关闭服务（将未处理完的请求处理完再关闭服务），超过5秒就超时退出
 	if err := util.Server.Shutdown(ctx); err != nil {
-		log.Fatal(0, "server shutdown:", err)
+		common.Fatal(0, "server shutdown:", err)
 	}
 	util.ServerIsRunning = false
-	log.Info("server exited")
+	common.Info("server exited")
 }
 
 func Restart() {

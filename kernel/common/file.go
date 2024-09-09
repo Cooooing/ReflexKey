@@ -1,7 +1,6 @@
-package file
+package common
 
 import (
-	"kernel/common/log"
 	"os"
 )
 
@@ -38,7 +37,7 @@ func IsDir(path string) bool {
 	}
 
 	if nil != err {
-		log.Warn("determines whether [%s] is a directory failed: [%v]", path, err)
+		Warn("determines whether [%s] is a directory failed: [%v]", path, err)
 		return false
 	}
 	return fio.IsDir()

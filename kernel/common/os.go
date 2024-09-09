@@ -4,7 +4,6 @@ import (
 	"bytes"
 	"errors"
 	"github.com/shirou/gopsutil/v3/host"
-	"kernel/common/log"
 	"os"
 	"os/exec"
 	"os/user"
@@ -86,7 +85,7 @@ func homeWindows() (string, error) {
 func GetOSPlatform() (plat string) {
 	plat, _, _, err := host.PlatformInformation()
 	if nil != err {
-		log.Warn("get os platform failed: %s", err)
+		Warn("get os platform failed: %s", err)
 		return "Unknown"
 	}
 	return

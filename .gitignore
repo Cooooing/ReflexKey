@@ -11,6 +11,7 @@
 # kernel
 /kernel/log/
 /kernel/workspace/
+/kernel/*.exe
 
 
 # release

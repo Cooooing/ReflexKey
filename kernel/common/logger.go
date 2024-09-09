@@ -1,10 +1,9 @@
-package log
+package common
 
 import (
 	"bytes"
 	"fmt"
 	"io"
-	"kernel/common/file"
 	"log"
 	"os"
 	"path/filepath"
@@ -96,15 +95,15 @@ func openLogger() {
 	lock.Lock()
 
 	// Todo 临时解决日志文件过大的问题
-	if file.IsExist(LogPath) {
-		if size := file.GetFileSize(LogPath); 1024*1024*32 <= size {
+	if IsExist(LogPath) {
+		if size := GetFileSize(LogPath); 1024*1024*32 <= size {
 			// 日志文件大于 32M 的话删了重建
 			_ = os.Remove(LogPath)
 		}
 	}
 
 	dir, _ := filepath.Split(LogPath)
-	if !file.IsExist(dir) {
+	if !IsExist(dir) {
 		if err := os.MkdirAll(dir, 0755); nil != err {
 			log.Printf("create log dir [%s] failed: %s", dir, err)
 		}
@@ -126,7 +125,7 @@ func closeLogger() {
 func Recover() {
 	if e := recover(); nil != e {
 		stack := stack()
-		msg := fmt.Sprintf("%s PANIC RECOVERED: %v\n%s\n", e, stack)
+		msg := fmt.Sprintf("PANIC RECOVERED: %v\n%s\n", e, stack)
 		Error(msg)
 	}
 }
@@ -134,7 +133,7 @@ func Recover() {
 func RecoverError(e any) {
 	if nil != e {
 		stack := stack()
-		msg := fmt.Sprintf("%s PANIC RECOVERED: %v\n%s\n", e, stack)
+		msg := fmt.Sprintf("PANIC RECOVERED: %v\n%s\n", e, stack)
 		Error(msg)
 	}
 }
@@ -283,7 +282,7 @@ func (l *Logger) IsWarnEnabled() bool {
 	return l.level <= WARN
 }
 
-// Trace prints trace level message with format.
+// LogTrace prints trace level message with format.
 func (l *Logger) LogTrace(format string, v ...interface{}) {
 	if TRACE < l.level {
 		return
@@ -293,7 +292,7 @@ func (l *Logger) LogTrace(format string, v ...interface{}) {
 	_ = l.logger.Output(3, fmt.Sprintf(format, v...))
 }
 
-// Debug prints debug level message with format.
+// LogDebug prints debug level message with format.
 func (l *Logger) LogDebug(format string, v ...interface{}) {
 	if DEBUG < l.level {
 		return
@@ -303,7 +302,7 @@ func (l *Logger) LogDebug(format string, v ...interface{}) {
 	_ = l.logger.Output(3, fmt.Sprintf(format, v...))
 }
 
-// Info prints info level message with format.
+// LogInfo prints info level message with format.
 func (l *Logger) LogInfo(format string, v ...interface{}) {
 	if INFO < l.level {
 		return
@@ -313,7 +312,7 @@ func (l *Logger) LogInfo(format string, v ...interface{}) {
 	_ = l.logger.Output(3, fmt.Sprintf(format, v...))
 }
 
-// Warn prints warning level message with format.
+// LogWarn prints warning level message with format.
 func (l *Logger) LogWarn(format string, v ...interface{}) {
 	if WARN < l.level {
 		return
@@ -324,7 +323,7 @@ func (l *Logger) LogWarn(format string, v ...interface{}) {
 	_ = l.logger.Output(3, msg)
 }
 
-// Error prints error level message with format.
+// LogError prints error level message with format.
 func (l *Logger) LogError(format string, v ...interface{}) {
 	if ERROR < l.level {
 		return
@@ -336,7 +335,7 @@ func (l *Logger) LogError(format string, v ...interface{}) {
 	//sentry.CaptureMessage(msg)
 }
 
-// Fatal prints fatal level message with format and exit process with code 1.
+// LogFatal prints fatal level message with format and exit process with code 1.
 func (l *Logger) LogFatal(exitCode int, format string, v ...interface{}) {
 	if FATAL < l.level {
 		return
@@ -344,7 +343,7 @@ func (l *Logger) LogFatal(exitCode int, format string, v ...interface{}) {
 
 	l.logger.SetPrefix("FATAL ")
 	format += "\n%s"
-	v = append(v, shortStack())
+	v = append(v, ShortStack())
 	msg := fmt.Sprintf(format, v...)
 	_ = l.logger.Output(3, msg)
 	//sentry.CaptureMessage(msg)
@@ -352,7 +351,7 @@ func (l *Logger) LogFatal(exitCode int, format string, v ...interface{}) {
 	os.Exit(exitCode)
 }
 
-func shortStack() string {
+func ShortStack() string {
 	output := string(debug.Stack())
 	lines := strings.Split(output, "\n")
 	if 11 < len(lines) {
