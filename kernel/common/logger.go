@@ -42,7 +42,7 @@ func SetLogPath(path string) {
 	LogPath = path
 }
 
-func Trace(format string, v ...interface{}) {
+func Trace(format string, v ...any) {
 	defer closeLogger()
 	openLogger()
 
@@ -52,7 +52,7 @@ func Trace(format string, v ...interface{}) {
 	logger.LogTrace(format, v...)
 }
 
-func Debug(format string, v ...interface{}) {
+func Debug(format string, v ...any) {
 	defer closeLogger()
 	openLogger()
 
@@ -62,19 +62,19 @@ func Debug(format string, v ...interface{}) {
 	logger.LogDebug(format, v...)
 }
 
-func Info(format string, v ...interface{}) {
+func Info(format string, v ...any) {
 	defer closeLogger()
 	openLogger()
 	logger.LogInfo(format, v...)
 }
 
-func Error(format string, v ...interface{}) {
+func Error(format string, v ...any) {
 	defer closeLogger()
 	openLogger()
 	logger.LogError(format, v...)
 }
 
-func Warn(format string, v ...interface{}) {
+func Warn(format string, v ...any) {
 	defer closeLogger()
 	openLogger()
 
@@ -84,7 +84,7 @@ func Warn(format string, v ...interface{}) {
 	logger.LogWarn(format, v...)
 }
 
-func Fatal(exitCode int, format string, v ...interface{}) {
+func Fatal(exitCode int, format string, v ...any) {
 	openLogger()
 	logger.LogFatal(exitCode, format, v...)
 }
@@ -283,7 +283,7 @@ func (l *Logger) IsWarnEnabled() bool {
 }
 
 // LogTrace prints trace level message with format.
-func (l *Logger) LogTrace(format string, v ...interface{}) {
+func (l *Logger) LogTrace(format string, v ...any) {
 	if TRACE < l.level {
 		return
 	}
@@ -293,7 +293,7 @@ func (l *Logger) LogTrace(format string, v ...interface{}) {
 }
 
 // LogDebug prints debug level message with format.
-func (l *Logger) LogDebug(format string, v ...interface{}) {
+func (l *Logger) LogDebug(format string, v ...any) {
 	if DEBUG < l.level {
 		return
 	}
@@ -303,7 +303,7 @@ func (l *Logger) LogDebug(format string, v ...interface{}) {
 }
 
 // LogInfo prints info level message with format.
-func (l *Logger) LogInfo(format string, v ...interface{}) {
+func (l *Logger) LogInfo(format string, v ...any) {
 	if INFO < l.level {
 		return
 	}
@@ -313,7 +313,7 @@ func (l *Logger) LogInfo(format string, v ...interface{}) {
 }
 
 // LogWarn prints warning level message with format.
-func (l *Logger) LogWarn(format string, v ...interface{}) {
+func (l *Logger) LogWarn(format string, v ...any) {
 	if WARN < l.level {
 		return
 	}
@@ -324,7 +324,7 @@ func (l *Logger) LogWarn(format string, v ...interface{}) {
 }
 
 // LogError prints error level message with format.
-func (l *Logger) LogError(format string, v ...interface{}) {
+func (l *Logger) LogError(format string, v ...any) {
 	if ERROR < l.level {
 		return
 	}
@@ -336,7 +336,7 @@ func (l *Logger) LogError(format string, v ...interface{}) {
 }
 
 // LogFatal prints fatal level message with format and exit process with code 1.
-func (l *Logger) LogFatal(exitCode int, format string, v ...interface{}) {
+func (l *Logger) LogFatal(exitCode int, format string, v ...any) {
 	if FATAL < l.level {
 		return
 	}

@@ -1,7 +1,6 @@
 package api
 
 import (
-	"fmt"
 	"github.com/gin-gonic/gin"
 	"kernel/model"
 	"kernel/sql"
@@ -17,7 +16,7 @@ func ping(c *gin.Context) {
 }
 
 func db(c *gin.Context) {
-	arg := map[string]interface{}{}
+	arg := map[string]any{}
 	c.BindJSON(&arg)
 	s := arg["sql"].(string)
 	page := int64(arg["page"].(float64))
@@ -25,21 +24,4 @@ func db(c *gin.Context) {
 
 	list := sql.QueryForPage(page, size, s)
 	c.JSON(http.StatusOK, model.Success(list))
-}
-
-func db1(c *gin.Context) {
-	arg := map[string]interface{}{}
-	c.BindJSON(&arg)
-	s := arg["sql"].(string)
-
-	var s3 []s2
-	sql.DB.Raw(s).Scan(&s3)
-	for i := range s3 {
-		fmt.Println(s3[i])
-	}
-	c.JSON(http.StatusOK, model.Success(s3))
-}
-
-type s2 struct {
-	Id int64
 }

@@ -1,22 +1,20 @@
 package sql
 
 import (
-	"fmt"
+	"database/sql"
+	_ "github.com/mattn/go-sqlite3"
 	"kernel/common"
 	"kernel/model"
 	"kernel/util"
 	"os"
 	"runtime"
 	"runtime/debug"
+	"strings"
 	"sync"
-
-	"gorm.io/driver/sqlite"
-	"gorm.io/gorm"
+	"time"
 )
 
-var (
-	DB *gorm.DB
-)
+var db *sql.DB
 
 var initDatabaseLock = sync.Mutex{}
 
@@ -52,22 +50,35 @@ func InitDatabase(forceRebuild bool) (err error) {
 }
 
 func initDBConnection() {
-	if nil != DB {
+	if nil != db {
 		_ = closeDatabase()
 	}
+
 	var err error
-	DB, err = gorm.Open(sqlite.Open(util.DBPath), &gorm.Config{})
+	dsn := util.DBPath + "?_journal_mode=WAL" +
+		"&_synchronous=OFF" +
+		"&_mmap_size=2684354560" +
+		"&_secure_delete=OFF" +
+		"&_cache_size=-20480" +
+		"&_page_size=32768" +
+		"&_busy_timeout=7000" +
+		"&_ignore_check_constraints=ON" +
+		"&_temp_store=MEMORY" +
+		"&_case_sensitive_like=OFF"
+	db, err = sql.Open("sqlite3", dsn)
 	if nil != err {
 		common.Fatal(common.ExitCodeReadOnlyDatabase, "create database failed: %s", err)
 	}
+	db.SetMaxIdleConns(20)
+	db.SetMaxOpenConns(20)
+	db.SetConnMaxLifetime(365 * 24 * time.Hour)
 }
 
 func closeDatabase() (err error) {
-	if nil == DB {
+	if nil == db {
 		return
 	}
 
-	db, err := DB.DB()
 	err = db.Close()
 	debug.FreeOSMemory()
 	runtime.GC() // 没有这句的话文件句柄不会释放，后面就无法删除文件
@@ -90,21 +101,24 @@ func removeDatabaseFile() (err error) {
 	return
 }
 
-func QueryForList(sql string, params ...any) []map[string]interface{} {
-	res := make([]map[string]interface{}, 0)
-	db, _ := DB.DB()
+func initTables() {
+
+}
+
+func QueryForList(sql string, params ...any) []map[string]any {
+	res := make([]map[string]any, 0)
 	rows, err := db.Query(sql, params...)
-	common.Info("query: %s", sql)
 	if err != nil {
 		common.Error("query failed: %s", err)
 		return nil
 	}
 	defer rows.Close()
+	logSql(sql, params...)
 
 	columns, _ := rows.Columns()
 	count := len(columns)
-	values := make([]interface{}, count)
-	valPointers := make([]interface{}, count)
+	values := make([]any, count)
+	valPointers := make([]any, count)
 	for rows.Next() {
 
 		// 获取各列的值的地址
@@ -116,11 +130,11 @@ func QueryForList(sql string, params ...any) []map[string]interface{} {
 		_ = rows.Scan(valPointers...)
 
 		// 一条数据的Map (列名和值的键值对)
-		entry := make(map[string]interface{})
+		entry := make(map[string]any)
 
 		// Map 赋值
 		for i, col := range columns {
-			var v interface{}
+			var v any
 
 			// 值复制给val(所以Scan时指定的地址可重复使用)
 			val := values[i]
@@ -142,8 +156,6 @@ func QueryForList(sql string, params ...any) []map[string]interface{} {
 func QueryForPage(page int64, size int64, sql string, params ...any) model.Page {
 	pageSql := "select * from (" + sql + ") limit ? offset ?"
 	PageParams := append(params, size, (page-1)*size)
-	fmt.Println(params)
-	fmt.Println(PageParams)
 	res := model.Page{
 		Total: QueryForCount(sql, params...),
 		Data:  QueryForList(pageSql, PageParams...),
@@ -155,10 +167,49 @@ func QueryForPage(page int64, size int64, sql string, params ...any) model.Page 
 
 func QueryForCount(sql string, params ...any) int64 {
 	var res int64
-	db, _ := DB.DB()
 	sql = "select count(*) from (" + sql + ")"
 	row := db.QueryRow(sql, params...)
-	common.Info("query: %s", sql)
 	_ = row.Scan(&res)
 	return res
+}
+
+func logSql(sql string, params ...any) {
+	sql = sqlStringFormat(sql, params...)
+	common.Info(sql, params...)
+}
+
+func sqlStringFormat(s string, args ...any) string {
+	for _, arg := range args {
+		f := "!"
+		switch arg.(type) {
+		case string:
+			f = "%s"
+		case float64:
+			f = "%f"
+		case float32:
+			f = "%f"
+		case int:
+			f = "%d"
+		case int64:
+			f = "%d"
+		case int32:
+			f = "%d"
+		case int16:
+			f = "%d"
+		case int8:
+			f = "%d"
+		case uint:
+			f = "%d"
+		case uint64:
+			f = "%d"
+		case uint32:
+			f = "%d"
+		case uint16:
+			f = "%d"
+		case uint8:
+			f = "%d"
+		}
+		s = strings.Replace(s, "?", f, 1)
+	}
+	return s
 }
