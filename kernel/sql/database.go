@@ -153,15 +153,20 @@ func QueryForList(sql string, params ...any) []map[string]any {
 	return res
 }
 
-func QueryForPage(page int64, size int64, sql string, params ...any) model.Page {
+func QueryForPage(current int64, size int64, sql string, params ...any) model.Page {
 	pageSql := "select * from (" + sql + ") limit ? offset ?"
-	PageParams := append(params, size, (page-1)*size)
+	PageParams := append(params, size, (current-1)*size)
 	res := model.Page{
-		Total: QueryForCount(sql, params...),
-		Data:  QueryForList(pageSql, PageParams...),
-		Page:  page,
-		Size:  size,
+		Total:   QueryForCount(sql, params...),
+		Data:    QueryForList(pageSql, PageParams...),
+		Page:    0,
+		Current: current,
+		Size:    size,
 	}
+	if res.Total != 0 && res.Size > 0 {
+		res.Page = (res.Total-1)/size + 1
+	}
+	//(page.totalRecord - 1L) / page.pageSize + 1L;
 	return res
 }
 

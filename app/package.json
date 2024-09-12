@@ -22,7 +22,9 @@
   },
   "dependencies": {
     "@electron-toolkit/preload": "^3.0.0",
-    "@electron-toolkit/utils": "^3.0.0"
+    "@electron-toolkit/utils": "^3.0.0",
+    "@volar/language-server": "2.4.0-alpha.18",
+    "@vue/language-server": "2.0.28"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^1.0.2",
