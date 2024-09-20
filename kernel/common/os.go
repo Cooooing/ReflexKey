@@ -12,17 +12,17 @@ import (
 )
 
 // IsWindows determines whether current OS is Windows.
-func IsWindows() bool {
+func (*GuOs) IsWindows() bool {
 	return "windows" == runtime.GOOS
 }
 
 // IsLinux determines whether current OS is Linux.
-func IsLinux() bool {
+func (*GuOs) IsLinux() bool {
 	return "linux" == runtime.GOOS
 }
 
 // IsDarwin determines whether current OS is Darwin.
-func IsDarwin() bool {
+func (*GuOs) IsDarwin() bool {
 	return "darwin" == runtime.GOOS
 }
 
@@ -30,7 +30,7 @@ func IsDarwin() bool {
 //
 // This uses an OS-specific method for discovering the home directory.
 // An error is returned if a home directory cannot be detected.
-func Home() (string, error) {
+func (os *GuOs) Home() (string, error) {
 	user, err := user.Current()
 	if nil == err {
 		return user.HomeDir, nil
@@ -38,15 +38,15 @@ func Home() (string, error) {
 
 	// cross compile support
 
-	if IsWindows() {
-		return homeWindows()
+	if os.IsWindows() {
+		return os.homeWindows()
 	}
 
 	// Unix-like system, so just assume Unix
-	return homeUnix()
+	return os.homeUnix()
 }
 
-func homeUnix() (string, error) {
+func (*GuOs) homeUnix() (string, error) {
 	// First prefer the HOME environmental variable
 	if home := os.Getenv("HOME"); home != "" {
 		return home, nil
@@ -68,7 +68,7 @@ func homeUnix() (string, error) {
 	return result, nil
 }
 
-func homeWindows() (string, error) {
+func (*GuOs) homeWindows() (string, error) {
 	drive := os.Getenv("HOMEDRIVE")
 	path := os.Getenv("HOMEPATH")
 	home := drive + path
@@ -82,10 +82,10 @@ func homeWindows() (string, error) {
 	return home, nil
 }
 
-func GetOSPlatform() (plat string) {
+func (*GuOs) GetOSPlatform() (plat string) {
 	plat, _, _, err := host.PlatformInformation()
 	if nil != err {
-		Warn("get os platform failed: %s", err)
+		Log.Warn("get os platform failed: %s", err)
 		return "Unknown"
 	}
 	return

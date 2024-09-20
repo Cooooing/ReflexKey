@@ -42,7 +42,7 @@ func SetLogPath(path string) {
 	LogPath = path
 }
 
-func Trace(format string, v ...any) {
+func (*GuLog) Trace(format string, v ...any) {
 	defer closeLogger()
 	openLogger()
 
@@ -52,7 +52,7 @@ func Trace(format string, v ...any) {
 	logger.LogTrace(format, v...)
 }
 
-func Debug(format string, v ...any) {
+func (*GuLog) Debug(format string, v ...any) {
 	defer closeLogger()
 	openLogger()
 
@@ -62,19 +62,19 @@ func Debug(format string, v ...any) {
 	logger.LogDebug(format, v...)
 }
 
-func Info(format string, v ...any) {
+func (*GuLog) Info(format string, v ...any) {
 	defer closeLogger()
 	openLogger()
 	logger.LogInfo(format, v...)
 }
 
-func Error(format string, v ...any) {
+func (*GuLog) Error(format string, v ...any) {
 	defer closeLogger()
 	openLogger()
 	logger.LogError(format, v...)
 }
 
-func Warn(format string, v ...any) {
+func (*GuLog) Warn(format string, v ...any) {
 	defer closeLogger()
 	openLogger()
 
@@ -84,7 +84,7 @@ func Warn(format string, v ...any) {
 	logger.LogWarn(format, v...)
 }
 
-func Fatal(exitCode int, format string, v ...any) {
+func (*GuLog) Fatal(exitCode int, format string, v ...any) {
 	openLogger()
 	logger.LogFatal(exitCode, format, v...)
 }
@@ -95,15 +95,15 @@ func openLogger() {
 	lock.Lock()
 
 	// Todo 临时解决日志文件过大的问题
-	if IsExist(LogPath) {
-		if size := GetFileSize(LogPath); 1024*1024*32 <= size {
+	if File.IsExist(LogPath) {
+		if size := File.GetFileSize(LogPath); 1024*1024*32 <= size {
 			// 日志文件大于 32M 的话删了重建
 			_ = os.Remove(LogPath)
 		}
 	}
 
 	dir, _ := filepath.Split(LogPath)
-	if !IsExist(dir) {
+	if !File.IsExist(dir) {
 		if err := os.MkdirAll(dir, 0755); nil != err {
 			log.Printf("create log dir [%s] failed: %s", dir, err)
 		}
@@ -122,19 +122,19 @@ func closeLogger() {
 	lock.Unlock()
 }
 
-func Recover() {
+func (l *GuLog) Recover() {
 	if e := recover(); nil != e {
 		stack := stack()
 		msg := fmt.Sprintf("PANIC RECOVERED: %v\n%s\n", e, stack)
-		Error(msg)
+		l.Error(msg)
 	}
 }
 
-func RecoverError(e any) {
+func (l *GuLog) RecoverError(e any) {
 	if nil != e {
 		stack := stack()
 		msg := fmt.Sprintf("PANIC RECOVERED: %v\n%s\n", e, stack)
-		Error(msg)
+		l.Error(msg)
 	}
 }
 

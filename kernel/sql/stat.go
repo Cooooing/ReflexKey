@@ -12,7 +12,7 @@ type Stat struct {
 //	row := DB.QueryRow(stmt, key)
 //	if err := row.Scan(&ret); nil != err {
 //		if !strings.Contains(err.Error(), "no such table") {
-//			common.Error("query database version failed: %s", err)
+//			common.Log.Error("query database version failed: %s", err)
 //		}
 //	}
 //	return

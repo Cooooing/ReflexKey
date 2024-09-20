@@ -59,10 +59,10 @@ func InitConf() {
 		}
 	} else {
 		if 0 < semver.Compare("v"+conf.VERSION, "v"+Conf.System.KernelVersion) {
-			common.Info("upgraded from version [%s] to [%s]", Conf.System.KernelVersion, conf.VERSION)
+			common.Log.Info("upgraded from version [%s] to [%s]", Conf.System.KernelVersion, conf.VERSION)
 			Conf.ShowChangelog = true
 		} else if 0 > semver.Compare("v"+conf.VERSION, "v"+Conf.System.KernelVersion) {
-			common.Info("downgraded from version [%s] to [%s]", Conf.System.KernelVersion, conf.VERSION)
+			common.Log.Info("downgraded from version [%s] to [%s]", Conf.System.KernelVersion, conf.VERSION)
 		}
 
 		Conf.System.KernelVersion = conf.VERSION

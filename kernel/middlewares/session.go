@@ -24,14 +24,14 @@ func Logging(c *gin.Context) {
 		path = path + "?" + raw
 	}
 
-	common.Info(" %d | %d | %s | %s | %s %s ", c.Writer.Status(), c.Writer.Size(), latency, c.ClientIP(), c.Request.Method, path)
+	common.Log.Info(" %d | %d | %s | %s | %s %s ", c.Writer.Status(), c.Writer.Size(), latency, c.ClientIP(), c.Request.Method, path)
 }
 
 // Recover 异常处理、日志记录
 func Recover(c *gin.Context) {
 	defer func() {
 		if e := recover(); nil != e {
-			common.RecoverError(e)
+			common.Log.RecoverError(e)
 			c.JSON(http.StatusInternalServerError, model.Fail(fmt.Sprintf("%v", e)))
 			c.Abort()
 		}

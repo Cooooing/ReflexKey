@@ -29,7 +29,7 @@ func InitDatabase(forceRebuild bool) (err error) {
 		//if conf.DatabaseVer == getDatabaseVer() {
 		return
 		//}
-		common.Info("the database structure is changed, rebuilding database...")
+		common.Log.Info("the database structure is changed, rebuilding database...")
 	}
 
 	// 不存在库或者版本不一致都会走到这里
@@ -37,7 +37,7 @@ func InitDatabase(forceRebuild bool) (err error) {
 	//_ = closeDatabase()
 	//if common.IsExist(util.DBPath) {
 	//	if err = removeDatabaseFile(); nil != err {
-	//		common.Error("remove database file [%s] failed: %s", util.DBPath, err)
+	//		common.Log.Error("remove database file [%s] failed: %s", util.DBPath, err)
 	//		err = nil
 	//	}
 	//}
@@ -45,7 +45,7 @@ func InitDatabase(forceRebuild bool) (err error) {
 	//initDBConnection()
 	//initDBTables()
 
-	common.Info("reinitialized database [%s]", util.DBPath)
+	common.Log.Info("reinitialized database [%s]", util.DBPath)
 	return
 }
 
@@ -67,7 +67,7 @@ func initDBConnection() {
 		"&_case_sensitive_like=OFF"
 	db, err = sql.Open("sqlite3", dsn)
 	if nil != err {
-		common.Fatal(common.ExitCodeReadOnlyDatabase, "create database failed: %s", err)
+		common.Log.Fatal(common.ExitCodeReadOnlyDatabase, "create database failed: %s", err)
 	}
 	db.SetMaxIdleConns(20)
 	db.SetMaxOpenConns(20)
@@ -109,7 +109,7 @@ func QueryForList(sql string, params ...any) []map[string]any {
 	res := make([]map[string]any, 0)
 	rows, err := db.Query(sql, params...)
 	if err != nil {
-		common.Error("query failed: %s", err)
+		common.Log.Error("query failed: %s", err)
 		return nil
 	}
 	defer rows.Close()
@@ -180,7 +180,7 @@ func QueryForCount(sql string, params ...any) int64 {
 
 func logSql(sql string, params ...any) {
 	sql = sqlStringFormat(sql, params...)
-	common.Info(sql, params...)
+	common.Log.Info(sql, params...)
 }
 
 func sqlStringFormat(s string, args ...any) string {
