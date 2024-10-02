@@ -24,7 +24,9 @@
     "@electron-toolkit/preload": "^3.0.0",
     "@electron-toolkit/utils": "^3.0.0",
     "@volar/language-server": "2.4.0-alpha.18",
-    "@vue/language-server": "2.0.28"
+    "@vue/language-server": "2.0.28",
+    "element-plus": "^2.8.3",
+    "vue-router": "^4.4.5"
   },
   "devDependencies": {
     "@electron-toolkit/eslint-config": "^1.0.2",
@@ -36,8 +38,8 @@
     "@vue/eslint-config-prettier": "^9.0.0",
     "@vue/eslint-config-typescript": "^13.0.0",
     "electron": "^31.0.2",
-    "electron-vite": "^2.3.0",
     "electron-builder": "^25.0.5",
+    "electron-vite": "^2.3.0",
     "eslint": "^8.57.0",
     "eslint-plugin-vue": "^9.26.0",
     "prettier": "^3.3.2",

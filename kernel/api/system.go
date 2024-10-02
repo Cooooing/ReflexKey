@@ -25,3 +25,10 @@ func db(c *gin.Context) {
 	list := sql.QueryForPage(page, size, s)
 	c.JSON(http.StatusOK, model.Success(list))
 }
+
+func err(c *gin.Context) {
+	// 无意抛出 panic
+	var slice = []int{1, 2, 3, 4, 5}
+	slice[6] = 6
+	//c.JSON(http.StatusOK, model.Success(true))
+}

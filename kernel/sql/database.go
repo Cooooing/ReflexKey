@@ -65,6 +65,7 @@ func initDBConnection() {
 		"&_ignore_check_constraints=ON" +
 		"&_temp_store=MEMORY" +
 		"&_case_sensitive_like=OFF"
+	common.Log.Info("open database [%s]", util.DBPath)
 	db, err = sql.Open("sqlite3", dsn)
 	if nil != err {
 		common.Log.Fatal(common.ExitCodeReadOnlyDatabase, "create database failed: %s", err)
@@ -166,7 +167,6 @@ func QueryForPage(current int64, size int64, sql string, params ...any) model.Pa
 	if res.Total != 0 && res.Size > 0 {
 		res.Page = (res.Total-1)/size + 1
 	}
-	//(page.totalRecord - 1L) / page.pageSize + 1L;
 	return res
 }
 

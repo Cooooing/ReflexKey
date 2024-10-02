@@ -27,7 +27,14 @@ func ServeAPI(ginServer *gin.Engine) {
 	ginServer.StaticFS("/more", http.Dir("./workspace"))
 	ginServer.StaticFile("/favicon.ico", "./workspace/data/resources/icon.png")
 
-	ginServer.Handle("GET", "/api/system/ping", ping)
-	ginServer.Handle("GET", "/api/system/db", db)
+	api := ginServer.Group("/api")
+	{
+		system := api.Group("/system")
+		{
+			system.Handle("GET", "/ping", ping)
+			system.Handle("GET", "/db", db)
+			system.Handle("GET", "/err", err)
+		}
+	}
 
 }
