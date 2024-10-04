@@ -4,7 +4,7 @@ import (
 	"flag"
 	"github.com/gofrs/flock"
 	"kernel/common"
-	"kernel/conf"
+	"kernel/model"
 	"net/http"
 	"net/url"
 	"os"
@@ -16,9 +16,9 @@ import (
 	"github.com/common-nighthawk/go-figure"
 )
 
-var Mode = "dev"
+var Mode = Dev
 
-//var Mode = "prod"
+//var Mode = conf.Prod
 
 var (
 	ServerURL       *url.URL     // 内核服务 URL
@@ -34,6 +34,9 @@ var (
 )
 
 const (
+	Dev  = "dev"
+	Prod = "prod"
+
 	ContainerStd     = "std"     // 桌面端
 	ContainerDocker  = "docker"  // Docker 容器端
 	ContainerAndroid = "android" // Android 端
@@ -46,7 +49,7 @@ const (
 var (
 	WorkingDir, _ = os.Getwd()
 
-	WorkspaceDir   = filepath.Join(WorkingDir, conf.WORKSPACE_PATH) // 工作空间目录路径
+	WorkspaceDir   = filepath.Join(WorkingDir, model.WorkspacePath) // 工作空间目录路径
 	WorkspaceLock  *flock.Flock                                     // 工作空间锁
 	DataDir        string                                           // 数据目录路径
 	TempDir        string                                           // 临时目录路径
@@ -62,13 +65,13 @@ var (
 
 func Boot() {
 
-	workspacePath := flag.String("workspace", filepath.Join(WorkingDir, conf.WORKSPACE_PATH), "dir path of the workspace, default to ./workspace/")
+	workspacePath := flag.String("workspace", filepath.Join(WorkingDir, model.WorkspacePath), "dir path of the workspace, default to ./workspace/")
 	port := flag.String("port", FixedPort, "port of the HTTP server")
 	readOnly := flag.String("readonly", "false", "read-only mode")
 	accessAuthCode := flag.String("accessAuthCode", "", "access auth code")
-	ssl := flag.Bool("ssl", false, "for https and wss")
+	//ssl := flag.Bool("ssl", false, "for https and wss")
 	lang := flag.String("lang", "", "zh_CN/zh_CHT/en_US/fr_FR/es_ES/ja_JP")
-	mode := flag.String("mode", "prod", "dev/prod")
+	mode := flag.String("mode", "dev", "dev/prod")
 	flag.Parse()
 
 	if "" != *lang {
@@ -81,12 +84,12 @@ func Boot() {
 
 	initWorkspaceDir(*workspacePath)
 
-	SSL = *ssl
+	//SSL = *ssl
 
 	// 工作空间仅允许被一个内核进程伺服
 	tryLockWorkspace()
 
-	bootBanner := figure.NewColorFigure(conf.NAME, "isometric3", "green", true)
+	bootBanner := figure.NewColorFigure(model.Name, "isometric3", "green", true)
 	common.Log.Info("\n" + bootBanner.String())
 	logBootInfo()
 }
@@ -97,7 +100,7 @@ func initWorkspaceDir(workspaceArg string) {
 	TempDir = filepath.Join(WorkspaceDir, "temp")
 	LogPath = filepath.Join(TempDir, "log", "ReflexKey.log")
 	DBPath = filepath.Join(DataDir, DBName)
-	common.SetLogPath(LogPath)
+	common.Log.SetLogPath(LogPath)
 
 	if !common.File.IsExist(WorkspaceDir) {
 		if err := os.MkdirAll(WorkspaceDir, 0755); nil != err && !os.IsExist(err) {
@@ -209,5 +212,5 @@ func logBootInfo() {
 		"    * container [%s]\n"+
 		"    * database [ver=%s]\n"+
 		"    * workspace directory [%s]",
-		conf.VERSION, runtime.GOARCH, plat, os.Getpid(), Mode, WorkingDir, ReadOnly, Container, conf.DatabaseVer, WorkspaceDir)
+		model.Version, runtime.GOARCH, plat, os.Getpid(), Mode, WorkingDir, ReadOnly, Container, model.DatabaseVer, WorkspaceDir)
 }

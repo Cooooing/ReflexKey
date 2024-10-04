@@ -4,12 +4,11 @@ import (
 	"context"
 	"errors"
 	"fmt"
-	"github.com/gin-contrib/gzip"
 	"github.com/gin-gonic/gin"
 	"kernel/api"
 	"kernel/common"
+	"kernel/conf"
 	"kernel/middlewares"
-	"kernel/model"
 	"kernel/util"
 	"net"
 	"net/http"
@@ -29,17 +28,16 @@ func Start() {
 	ginServer.UseH2C = true
 	ginServer.MaxMultipartMemory = 1024 * 1024 * 32 // 表示处理上传的文件时，最多将32MB的数据保存在内存中，超出部分会保存到临时文件中。这样可以避免大文件上传时占用过多内存。
 	ginServer.Use(
+		middlewares.Logging,
 		middlewares.Recover,
 		middlewares.CorsMiddleware, // 后端服务支持 CORS 预检请求验证
-		middlewares.Logging,
-		gzip.Gzip(gzip.DefaultCompression, gzip.WithExcludedExtensions([]string{".pdf", ".mp3", ".wav", ".ogg", ".mov", ".weba", ".mkv", ".mp4", ".webm"})),
 	)
 
 	serveDebug(ginServer)
 	api.ServeAPI(ginServer)
 
 	var host string
-	if model.Conf.System.NetworkServe {
+	if conf.Conf.System.NetworkServe {
 		host = "0.0.0.0"
 	} else {
 		host = "127.0.0.1"
@@ -82,7 +80,7 @@ func Start() {
 	go func() {
 		if err = util.Server.Serve(ln); nil != err && !errors.Is(http.ErrServerClosed, err) {
 			util.ServerIsRunning = false
-			common.Log.Error("boot kernel failed: %s", err)
+			common.Log.Fatal(common.ExitCodeUnavailablePort, "boot kernel failed: %s", err)
 		}
 	}()
 
@@ -113,7 +111,7 @@ func Restart() {
 
 // serveDebug 生产模式下关闭 pprof
 func serveDebug(ginServer *gin.Engine) {
-	if "prod" == util.Mode {
+	if util.Prod == util.Mode {
 		return
 	}
 

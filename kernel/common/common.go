@@ -1,13 +1,21 @@
 package common
 
 type (
-	GuLog  byte
-	GuFile byte
-	GuOs   byte
+	GuLog       byte
+	GuSqliteLog byte
+	GuFile      byte
+	GuFileLock  byte
+	GuOs        byte
+	GuRand      byte
+	GuRuntime   byte
 )
 
 var (
-	Log  GuLog
-	File GuFile
-	OS   GuOs
+	Log      GuLog
+	SqlLog   GuSqliteLog
+	File     GuFile
+	FileLock GuFileLock
+	OS       GuOs
+	Rand     GuRand
+	Runtime  GuRuntime
 )

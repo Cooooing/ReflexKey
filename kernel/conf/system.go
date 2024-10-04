@@ -1,5 +1,10 @@
 package conf
 
+import (
+	"kernel/common"
+	"kernel/model"
+)
+
 type System struct {
 	ID               string `json:"id"`
 	Name             string `json:"name"`
@@ -18,21 +23,14 @@ type System struct {
 
 	NetworkServe bool          `json:"networkServe"` // 是否开启网络伺服
 	NetworkProxy *NetworkProxy `json:"networkProxy"`
-
-	UploadErrLog           bool `json:"uploadErrLog"`
-	DisableGoogleAnalytics bool `json:"disableGoogleAnalytics"`
-	DownloadInstallPkg     bool `json:"downloadInstallPkg"`
-	AutoLaunch2            int  `json:"autoLaunch2"`    // 0：不自动启动，1：自动启动，2：自动启动+隐藏主窗口
-	LockScreenMode         int  `json:"lockScreenMode"` // 0：手动，1：手动+跟随系统
 }
 
 func NewSystem() *System {
 	return &System{
-		//ID:                 util.GetDeviceID(),
-		//Name:               util.GetDeviceName(),
-		KernelVersion:      VERSION,
-		NetworkProxy:       &NetworkProxy{},
-		DownloadInstallPkg: true,
+		ID:            common.Runtime.GetDeviceID(),
+		Name:          common.Runtime.GetDeviceName(),
+		KernelVersion: model.Version,
+		NetworkProxy:  &NetworkProxy{},
 	}
 }
 

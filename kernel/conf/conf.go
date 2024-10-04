@@ -1,10 +1,13 @@
-package model
+package conf
 
 import (
+	"bytes"
+	"encoding/json"
 	"golang.org/x/mod/semver"
 	"kernel/common"
-	"kernel/conf"
+	"kernel/model"
 	"kernel/util"
+	"path/filepath"
 	"sync"
 )
 
@@ -25,10 +28,10 @@ type AppConf struct {
 	UserData string `json:"userData"` // 社区用户信息，对 User 加密存储
 	//User           *conf.User       `json:"-"`              // 社区用户内存结构，不持久化。不要直接使用，使用 GetUser() 和 SetUser() 方法
 	//Account        *conf.Account    `json:"account"`        // 帐号配置
-	ReadOnly       bool         `json:"readonly"`       // 是否是以只读模式运行
-	LocalIPs       []string     `json:"localIPs"`       // 本地 IP 列表
-	AccessAuthCode string       `json:"accessAuthCode"` // 访问授权码
-	System         *conf.System `json:"system"`         // 系统配置
+	ReadOnly       bool     `json:"readonly"`       // 是否是以只读模式运行
+	LocalIPs       []string `json:"localIPs"`       // 本地 IP 列表
+	AccessAuthCode string   `json:"accessAuthCode"` // 访问授权码
+	System         *System  `json:"system"`         // 系统配置
 	//Keymap         *conf.Keymap     `json:"keymap"`         // 快捷键配置
 	//Sync           *conf.Sync       `json:"sync"`           // 同步配置
 	//Search         *conf.Search     `json:"search"`         // 搜索配置
@@ -41,9 +44,6 @@ type AppConf struct {
 	//Publish        *conf.Publish    `json:"publish"`        // 发布服务
 	OpenHelp      bool `json:"openHelp"`      // 启动后是否需要打开用户指南
 	ShowChangelog bool `json:"showChangelog"` // 是否显示版本更新日志
-	CloudRegion   int  `json:"cloudRegion"`   // 云端区域，0：中国大陆，1：北美
-	//Snippet        *conf.Snpt       `json:"snippet"`        // 代码片段
-	DataIndexState int `json:"dataIndexState"` // 数据索引状态，0：已索引，1：未索引
 
 	m *sync.Mutex
 }
@@ -53,19 +53,56 @@ func InitConf() {
 	Conf = &AppConf{LogLevel: "trace", m: &sync.Mutex{}}
 
 	if nil == Conf.System {
-		Conf.System = conf.NewSystem()
+		Conf.System = NewSystem()
 		if util.ContainerIOS != util.Container {
 			Conf.OpenHelp = true
 		}
 	} else {
-		if 0 < semver.Compare("v"+conf.VERSION, "v"+Conf.System.KernelVersion) {
-			common.Log.Info("upgraded from version [%s] to [%s]", Conf.System.KernelVersion, conf.VERSION)
+		if 0 < semver.Compare("v"+model.Version, "v"+Conf.System.KernelVersion) {
+			common.Log.Info("upgraded from version [%s] to [%s]", Conf.System.KernelVersion, model.Version)
 			Conf.ShowChangelog = true
-		} else if 0 > semver.Compare("v"+conf.VERSION, "v"+Conf.System.KernelVersion) {
-			common.Log.Info("downgraded from version [%s] to [%s]", Conf.System.KernelVersion, conf.VERSION)
+		} else if 0 > semver.Compare("v"+model.Version, "v"+Conf.System.KernelVersion) {
+			common.Log.Info("downgraded from version [%s] to [%s]", Conf.System.KernelVersion, model.Version)
 		}
 
-		Conf.System.KernelVersion = conf.VERSION
+		Conf.System.KernelVersion = model.Version
 	}
 
+	common.Log.SetLogLevel(Conf.LogLevel)
+
+}
+
+func (conf *AppConf) Save() {
+	if util.ReadOnly {
+		return
+	}
+
+	Conf.m.Lock()
+	defer Conf.m.Unlock()
+
+	newData, _ := json.MarshalIndent(Conf, "", "  ")
+	confPath := filepath.Join(Conf.System.ConfDir, "conf.json")
+	oldData, err := common.FileLock.ReadFile(confPath)
+	if nil != err {
+		conf.save(newData)
+		return
+	}
+
+	if bytes.Equal(newData, oldData) {
+		return
+	}
+
+	conf.save(newData)
+}
+
+func (conf *AppConf) save(data []byte) {
+	confPath := filepath.Join(conf.System.ConfDir, "conf.json")
+	if err := common.FileLock.WriteFile(confPath, data); nil != err {
+		common.Log.Error("write conf [%s] failed: %s", confPath, err)
+		return
+	}
+}
+
+func (conf *AppConf) Close() {
+	conf.Save()
 }

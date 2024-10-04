@@ -24,7 +24,8 @@ const (
 )
 
 var (
-	logger  *Logger
+	level   int
+	logger  *log.Logger
 	logFile *os.File
 	LogPath string
 )
@@ -38,61 +39,61 @@ func init() {
 	LogPath = filepath.Join(dir, "log", "logging.log")
 }
 
-func SetLogPath(path string) {
+func (g *GuLog) SetLogPath(path string) {
 	LogPath = path
 }
 
-func (*GuLog) Trace(format string, v ...any) {
-	defer closeLogger()
-	openLogger()
+func (g *GuLog) Trace(format string, v ...any) {
+	defer g.closeLogger()
+	g.openLogger()
 
-	if !logger.IsTraceEnabled() {
+	if !g.isTraceEnabled() {
 		return
 	}
-	logger.LogTrace(format, v...)
+	g.logTrace(format, v...)
 }
 
-func (*GuLog) Debug(format string, v ...any) {
-	defer closeLogger()
-	openLogger()
+func (g *GuLog) Debug(format string, v ...any) {
+	defer g.closeLogger()
+	g.openLogger()
 
-	if !logger.IsDebugEnabled() {
+	if !g.isDebugEnabled() {
 		return
 	}
-	logger.LogDebug(format, v...)
+	g.logDebug(format, v...)
 }
 
-func (*GuLog) Info(format string, v ...any) {
-	defer closeLogger()
-	openLogger()
-	logger.LogInfo(format, v...)
+func (g *GuLog) Info(format string, v ...any) {
+	defer g.closeLogger()
+	g.openLogger()
+	g.logInfo(format, v...)
 }
 
-func (*GuLog) Error(format string, v ...any) {
-	defer closeLogger()
-	openLogger()
-	logger.LogError(format, v...)
+func (g *GuLog) Error(format string, v ...any) {
+	defer g.closeLogger()
+	g.openLogger()
+	g.logError(format, v...)
 }
 
-func (*GuLog) Warn(format string, v ...any) {
-	defer closeLogger()
-	openLogger()
+func (g *GuLog) Warn(format string, v ...any) {
+	defer g.closeLogger()
+	g.openLogger()
 
-	if !logger.IsWarnEnabled() {
+	if !g.isWarnEnabled() {
 		return
 	}
-	logger.LogWarn(format, v...)
+	g.logWarn(format, v...)
 }
 
-func (*GuLog) Fatal(exitCode int, format string, v ...any) {
-	openLogger()
-	logger.LogFatal(exitCode, format, v...)
+func (g *GuLog) Fatal(exitCode int, format string, v ...any) {
+	g.openLogger()
+	g.logFatal(exitCode, format, v...)
 }
 
-var lock = sync.Mutex{}
+var logLock = sync.Mutex{}
 
-func openLogger() {
-	lock.Lock()
+func (g *GuLog) openLogger() {
+	logLock.Lock()
 
 	// Todo 临时解决日志文件过大的问题
 	if File.IsExist(LogPath) {
@@ -114,27 +115,27 @@ func openLogger() {
 	if nil != err {
 		log.Printf("create log file [%s] failed: %s", LogPath, err)
 	}
-	logger = NewLogger(io.MultiWriter(os.Stdout, logFile))
+	g.initLogger(io.MultiWriter(os.Stdout, logFile))
 }
 
-func closeLogger() {
+func (g *GuLog) closeLogger() {
 	_ = logFile.Close()
-	lock.Unlock()
+	logLock.Unlock()
 }
 
-func (l *GuLog) Recover() {
+func (g *GuLog) Recover() {
 	if e := recover(); nil != e {
-		stack := stack()
+		stack := g.stack()
 		msg := fmt.Sprintf("PANIC RECOVERED: %v\n%s\n", e, stack)
-		l.Error(msg)
+		g.Error(msg)
 	}
 }
 
-func (l *GuLog) RecoverError(e any) {
+func (g *GuLog) RecoverError(e any) {
 	if nil != e {
-		stack := stack()
+		stack := g.stack()
 		msg := fmt.Sprintf("PANIC RECOVERED: %v\n%s\n", e, stack)
-		l.Error(msg)
+		g.Error(msg)
 	}
 }
 
@@ -146,7 +147,7 @@ var (
 )
 
 // stack implements Stack, skipping 2 frames.
-func stack() []byte {
+func (g *GuLog) stack() []byte {
 	buf := &bytes.Buffer{} // the returned data
 	// As we loop, we open files and read them. These variables record the currently
 	// loaded file.
@@ -168,13 +169,13 @@ func stack() []byte {
 			lastFile = file
 		}
 		line-- // in stack trace, lines are 1-indexed but our array is 0-indexed
-		_, _ = fmt.Fprintf(buf, "\t%s: %s\n", function(pc), source(lines, line))
+		_, _ = fmt.Fprintf(buf, "\t%s: %s\n", g.function(pc), g.source(lines, line))
 	}
 	return buf.Bytes()
 }
 
 // source returns a space-trimmed slice of the n'th line.
-func source(lines [][]byte, n int) []byte {
+func (g *GuLog) source(lines [][]byte, n int) []byte {
 	if n < 0 || n >= len(lines) {
 		return dunno
 	}
@@ -182,7 +183,7 @@ func source(lines [][]byte, n int) []byte {
 }
 
 // function returns, if possible, the name of the function containing the PC.
-func function(pc uintptr) []byte {
+func (g *GuLog) function(pc uintptr) []byte {
 	fn := runtime.FuncForPC(pc)
 	if fn == nil {
 		return dunno
@@ -217,32 +218,22 @@ const (
 	FATAL
 )
 
-// the global default logging level, it will be used for creating logger.
-var logLevel = DEBUG
-
-// Logger represents a simple logger with level.
-// The underlying logger is the standard Go logging "log".
-type Logger struct {
-	level  int
-	logger *log.Logger
-}
-
-// NewLogger creates a logger.
-func NewLogger(out io.Writer) *Logger {
-	ret := &Logger{level: logLevel, logger: log.New(out, "", log.Ldate|log.Ltime|log.Lshortfile)}
-	return ret
+// initLogger initializes the logger.
+func (g *GuLog) initLogger(out io.Writer) {
+	level = DEBUG
+	logger = log.New(out, "", log.Ldate|log.Ltime|log.Lshortfile)
 }
 
 // SetLogLevel sets the logging level of all loggers.
-func SetLogLevel(level string) {
-	logLevel = getLevel(level)
+func (g *GuLog) SetLogLevel(logLevel string) {
+	level = g.GetLevel(logLevel)
 }
 
-// getLevel gets logging level int value corresponding to the specified level.
-func getLevel(level string) int {
-	level = strings.ToLower(level)
+// GetLevel gets logging level int value corresponding to the specified level.
+func (g *GuLog) GetLevel(logLevel string) int {
+	logLevel = strings.ToLower(logLevel)
 
-	switch level {
+	switch logLevel {
 	case "off":
 		return OFF
 	case "trace":
@@ -262,96 +253,91 @@ func getLevel(level string) int {
 	}
 }
 
-// SetLevel sets the logging level of a logger.
-func (l *Logger) SetLevel(level string) {
-	l.level = getLevel(level)
+// isTraceEnabled determines whether the trace level is enabled.
+func (g *GuLog) isTraceEnabled() bool {
+	return level <= TRACE
 }
 
-// IsTraceEnabled determines whether the trace level is enabled.
-func (l *Logger) IsTraceEnabled() bool {
-	return l.level <= TRACE
+// isDebugEnabled determines whether the debug level is enabled.
+func (g *GuLog) isDebugEnabled() bool {
+	return level <= DEBUG
 }
 
-// IsDebugEnabled determines whether the debug level is enabled.
-func (l *Logger) IsDebugEnabled() bool {
-	return l.level <= DEBUG
+// isWarnEnabled determines whether the debug level is enabled.
+func (g *GuLog) isWarnEnabled() bool {
+	return level <= WARN
 }
 
-// IsWarnEnabled determines whether the debug level is enabled.
-func (l *Logger) IsWarnEnabled() bool {
-	return l.level <= WARN
-}
-
-// LogTrace prints trace level message with format.
-func (l *Logger) LogTrace(format string, v ...any) {
-	if TRACE < l.level {
+// logTrace prints trace level message with format.
+func (g *GuLog) logTrace(format string, v ...any) {
+	if TRACE < level {
 		return
 	}
 
-	l.logger.SetPrefix("TRACE ")
-	_ = l.logger.Output(3, fmt.Sprintf(format, v...))
+	logger.SetPrefix("TRACE ")
+	_ = logger.Output(3, fmt.Sprintf(format, v...))
 }
 
-// LogDebug prints debug level message with format.
-func (l *Logger) LogDebug(format string, v ...any) {
-	if DEBUG < l.level {
+// logDebug prints debug level message with format.
+func (g *GuLog) logDebug(format string, v ...any) {
+	if DEBUG < level {
 		return
 	}
 
-	l.logger.SetPrefix("DEBUG ")
-	_ = l.logger.Output(3, fmt.Sprintf(format, v...))
+	logger.SetPrefix("DEBUG ")
+	_ = logger.Output(3, fmt.Sprintf(format, v...))
 }
 
-// LogInfo prints info level message with format.
-func (l *Logger) LogInfo(format string, v ...any) {
-	if INFO < l.level {
+// logInfo prints info level message with format.
+func (g *GuLog) logInfo(format string, v ...any) {
+	if INFO < level {
 		return
 	}
 
-	l.logger.SetPrefix("INFO  ")
-	_ = l.logger.Output(3, fmt.Sprintf(format, v...))
+	logger.SetPrefix("INFO  ")
+	_ = logger.Output(3, fmt.Sprintf(format, v...))
 }
 
-// LogWarn prints warning level message with format.
-func (l *Logger) LogWarn(format string, v ...any) {
-	if WARN < l.level {
+// logWarn prints warning level message with format.
+func (g *GuLog) logWarn(format string, v ...any) {
+	if WARN < level {
 		return
 	}
 
-	l.logger.SetPrefix("WARN  ")
+	logger.SetPrefix("WARN  ")
 	msg := fmt.Sprintf(format, v...)
-	_ = l.logger.Output(3, msg)
+	_ = logger.Output(3, msg)
 }
 
-// LogError prints error level message with format.
-func (l *Logger) LogError(format string, v ...any) {
-	if ERROR < l.level {
+// logError prints error level message with format.
+func (g *GuLog) logError(format string, v ...any) {
+	if ERROR < level {
 		return
 	}
 
-	l.logger.SetPrefix("ERROR ")
+	logger.SetPrefix("ERROR ")
 	msg := fmt.Sprintf(format, v...)
-	_ = l.logger.Output(3, msg)
+	_ = logger.Output(3, msg)
 	//sentry.CaptureMessage(msg)
 }
 
-// LogFatal prints fatal level message with format and exit process with code 1.
-func (l *Logger) LogFatal(exitCode int, format string, v ...any) {
-	if FATAL < l.level {
+// logFatal prints fatal level message with format and exit process with code 1.
+func (g *GuLog) logFatal(exitCode int, format string, v ...any) {
+	if FATAL < level {
 		return
 	}
 
-	l.logger.SetPrefix("FATAL ")
+	logger.SetPrefix("FATAL ")
 	format += "\n%s"
-	v = append(v, ShortStack())
+	v = append(v, g.ShortStack())
 	msg := fmt.Sprintf(format, v...)
-	_ = l.logger.Output(3, msg)
+	_ = logger.Output(3, msg)
 	//sentry.CaptureMessage(msg)
-	closeLogger()
+	g.closeLogger()
 	os.Exit(exitCode)
 }
 
-func ShortStack() string {
+func (g *GuLog) ShortStack() string {
 	output := string(debug.Stack())
 	lines := strings.Split(output, "\n")
 	if 11 < len(lines) {

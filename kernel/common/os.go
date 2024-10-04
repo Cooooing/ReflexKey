@@ -12,17 +12,17 @@ import (
 )
 
 // IsWindows determines whether current OS is Windows.
-func (*GuOs) IsWindows() bool {
+func (g *GuOs) IsWindows() bool {
 	return "windows" == runtime.GOOS
 }
 
 // IsLinux determines whether current OS is Linux.
-func (*GuOs) IsLinux() bool {
+func (g *GuOs) IsLinux() bool {
 	return "linux" == runtime.GOOS
 }
 
 // IsDarwin determines whether current OS is Darwin.
-func (*GuOs) IsDarwin() bool {
+func (g *GuOs) IsDarwin() bool {
 	return "darwin" == runtime.GOOS
 }
 
@@ -46,7 +46,7 @@ func (os *GuOs) Home() (string, error) {
 	return os.homeUnix()
 }
 
-func (*GuOs) homeUnix() (string, error) {
+func (g *GuOs) homeUnix() (string, error) {
 	// First prefer the HOME environmental variable
 	if home := os.Getenv("HOME"); home != "" {
 		return home, nil
@@ -68,7 +68,7 @@ func (*GuOs) homeUnix() (string, error) {
 	return result, nil
 }
 
-func (*GuOs) homeWindows() (string, error) {
+func (g *GuOs) homeWindows() (string, error) {
 	drive := os.Getenv("HOMEDRIVE")
 	path := os.Getenv("HOMEPATH")
 	home := drive + path
@@ -82,7 +82,7 @@ func (*GuOs) homeWindows() (string, error) {
 	return home, nil
 }
 
-func (*GuOs) GetOSPlatform() (plat string) {
+func (g *GuOs) GetOSPlatform() (plat string) {
 	plat, _, _, err := host.PlatformInformation()
 	if nil != err {
 		Log.Warn("get os platform failed: %s", err)
