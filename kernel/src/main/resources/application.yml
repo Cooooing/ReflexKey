@@ -1,5 +1,38 @@
-spring:
-  application:
-    name: kernel
 server:
   port: 25566
+
+spring:
+  profiles:
+    active: dev
+  application:
+    name: kernel
+  datasource:
+    driver-class-name: org.sqlite.JDBC
+    url: jdbc:sqlite:./db/kernel.db
+#    username:
+#    password:
+
+# springdoc-openapi项目配置
+springdoc:
+  api-docs:
+    enabled: true
+    groups:
+      enabled: false
+  packages-to-scan: com.example.kernel
+
+# knife4j的增强配置
+knife4j:
+  enable: true
+  setting:
+    language: zh_cn
+    enable-home-custom: true
+    home-custom-path: classpath:markdown/home.md
+
+# mybatis-plus配置控制台打印完整带参数SQL语句
+mybatis-plus:
+  configuration:
+    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+
+path:
+  workspace: workspace
+  data: data

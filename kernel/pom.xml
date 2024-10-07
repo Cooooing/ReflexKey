@@ -10,7 +10,7 @@
     </parent>
     <groupId>com.example</groupId>
     <artifactId>kernel</artifactId>
-    <version>0.0.1-SNAPSHOT</version>
+    <version>0.0.1</version>
     <name>kernel</name>
     <description>kernel</description>
     <url/>
@@ -28,13 +28,14 @@
     </scm>
     <properties>
         <java.version>21</java.version>
+        <project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
+        <project.reporting.outputEncoding>UTF-8</project.reporting.outputEncoding>
     </properties>
     <dependencies>
         <dependency>
             <groupId>org.springframework.boot</groupId>
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
-
         <!-- web 依赖 -->
         <dependency>
             <groupId>org.springframework.boot</groupId>
@@ -52,7 +53,39 @@
             <artifactId>lombok</artifactId>
             <optional>true</optional>
         </dependency>
-
+        <!-- 邮件依赖 -->
+        <dependency>
+            <groupId>javax.mail</groupId>
+            <artifactId>mail</artifactId>
+            <version>1.4.7</version>
+        </dependency>
+        <!-- aop 依赖 -->
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-aop</artifactId>
+        </dependency>
+        <!-- 密码加密 -->
+        <dependency>
+            <groupId>org.mindrot</groupId>
+            <artifactId>jbcrypt</artifactId>
+            <version>0.4</version>
+        </dependency>
+        <!-- swagger依赖 -->
+        <dependency>
+            <groupId>com.github.xiaoymin</groupId>
+            <artifactId>knife4j-openapi3-jakarta-spring-boot-starter</artifactId>
+            <version>4.3.0</version>
+        </dependency>
+        <!-- 数据层依赖 -->
+        <dependency>
+            <groupId>org.xerial</groupId>
+            <artifactId>sqlite-jdbc</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.baomidou</groupId>
+            <artifactId>mybatis-plus-spring-boot3-starter</artifactId>
+            <version>3.5.8</version>
+        </dependency>
 
     </dependencies>
 
@@ -61,6 +94,14 @@
             <plugin>
                 <groupId>org.springframework.boot</groupId>
                 <artifactId>spring-boot-maven-plugin</artifactId>
+                <executions>
+                    <execution>
+                        <id>repackage</id>
+                        <goals>
+                            <goal>repackage</goal>
+                        </goals>
+                    </execution>
+                </executions>
             </plugin>
         </plugins>
     </build>
