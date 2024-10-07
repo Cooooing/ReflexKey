@@ -6,11 +6,6 @@ spring:
     active: dev
   application:
     name: kernel
-  datasource:
-    driver-class-name: org.sqlite.JDBC
-    url: jdbc:sqlite:./db/kernel.db
-#    username:
-#    password:
 
 # springdoc-openapi项目配置
 springdoc:

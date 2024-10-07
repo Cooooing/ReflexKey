@@ -18,7 +18,7 @@ public class KernelApplication {
             String name = entry.getKey();
             DataSource dataSource = entry.getValue();
             System.out.println(name);
-            System.out.println(dataSource.getConnection()); // 这里会抛出异常，直接throws走了
+            System.out.println(dataSource.getConnection());
         }
     }
 
