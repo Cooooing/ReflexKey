@@ -9,9 +9,11 @@
 
 
 # kernel
-/kernel/log/
-/kernel/workspace/
+/kernel1/log/
+/kernel1/workspace/
 /kernel/*.exe
+/kernel/dist/
+/kernel/target/
 
 
 # release

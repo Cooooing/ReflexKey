@@ -27,9 +27,9 @@ func InitDatabase(forceRebuild bool) (err error) {
 
 	if !forceRebuild {
 		// 检查数据库结构版本，如果版本不一致的话说明改过表结构，需要重建
-		if model.DatabaseVer == getDatabaseVer() {
-			return
-		}
+		//if model.DatabaseVer == GetDatabaseVer() {
+		//	return
+		//}
 		common.Log.Info("the database structure is changed, rebuilding database...")
 	}
 
@@ -135,7 +135,6 @@ func QueryForList(res any, sql string, params ...any) {
 	}
 	logSql(sql, params...)
 	DB.Raw(sql, params...).Scan(res)
-	common.Log.Info("QueryForListByMap: %v", res)
 }
 
 func QueryForPageByMap(current int64, size int64, sql string, params ...any) model.Page {

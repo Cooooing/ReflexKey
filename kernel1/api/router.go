@@ -33,6 +33,8 @@ func ServeAPI(ginServer *gin.Engine) {
 		{
 			system.Handle("GET", "/ping", ping)
 			system.Handle("GET", "/db", db)
+			system.Handle("GET", "/db1", db1)
+			system.Handle("GET", "/db2", db2)
 			system.Handle("GET", "/err", err)
 		}
 	}

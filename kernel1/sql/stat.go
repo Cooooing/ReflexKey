@@ -6,13 +6,14 @@ import (
 
 const key = "reflex_key_database_ver"
 
-func getDatabaseVer() (ret string) {
+func GetDatabaseVer() (ret model.Config) {
 	var config model.Config
 	DB.Where("env = ? and device = ? and key = ?", "all", "all", key).First(&config)
-	return config.Value
+	return config
+	//return config.Value
 }
 
-func setDatabaseVer() {
+func SetDatabaseVer() {
 	var config model.Config
 	DB.Where("env = ? and device = ? and key = ?", "all", "all", key).Delete(&config)
 	config = model.Config{

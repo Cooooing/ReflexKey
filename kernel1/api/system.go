@@ -2,7 +2,6 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
-	"kernel/common"
 	"kernel/model"
 	"kernel/sql"
 	"net/http"
@@ -25,8 +24,15 @@ func db(c *gin.Context) {
 
 	var scan []model.Config
 	list := sql.QueryForPage(page, size, &scan, s)
-	common.Log.Info("list: %v", list)
 	c.JSON(http.StatusOK, model.Success(list))
+}
+func db1(c *gin.Context) {
+	ret := sql.GetDatabaseVer()
+	c.JSON(http.StatusOK, model.Success(ret))
+}
+func db2(c *gin.Context) {
+	sql.SetDatabaseVer()
+	c.JSON(http.StatusOK, model.Success(""))
 }
 
 func err(c *gin.Context) {

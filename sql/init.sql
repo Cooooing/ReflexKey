@@ -13,6 +13,9 @@ create table if not exists `configs`
     `deleted_at` datetime default null                       -- 删除时间
 );
 
+insert into `configs` (`env`, `device`, `type`, `only_read`, `key`, `value`)
+values ('all', 'all', 'database', 1, 'reflex_key_database_ver', '1');
+
 select *
 from configs
 where env = 'all'
