@@ -1,33 +1,14 @@
 server:
   port: 25566
+  address: 127.0.0.1 # 监听地址 [127.0.0.1 仅本地访问 / 0.0.0.0 所有均可访问 / other 网卡地址]
 
 spring:
-  profiles:
-    active: dev
   application:
     name: kernel
-
-# springdoc-openapi项目配置
-springdoc:
-  api-docs:
-    enabled: true
-    groups:
-      enabled: false
-  packages-to-scan: com.example.kernel
-
-# knife4j的增强配置
-knife4j:
-  enable: true
-  setting:
-    language: zh_cn
-    enable-home-custom: true
-    home-custom-path: classpath:markdown/home.md
-
-# mybatis-plus配置控制台打印完整带参数SQL语句
-mybatis-plus:
-  configuration:
-    log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  profiles:
+    active: dev
 
 path:
-  workspace: workspace
-  data: data
+  workspace:
+  data:
+  log:
