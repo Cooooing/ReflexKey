@@ -9,7 +9,7 @@ import java.io.IOException;
 public class FileUtils {
 
     public static boolean createDirectory(String path) {
-        boolean flag = false;
+        boolean flag;
         File file = new File(path);
         if (!file.exists()) {
             flag = file.mkdirs();

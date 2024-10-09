@@ -1,6 +1,6 @@
 package com.example.kernel.properties;
 
-import com.example.kernel.entity.Global;
+import com.example.kernel.entity.base.Global;
 import com.example.kernel.util.FileUtils;
 import jakarta.annotation.PostConstruct;
 import lombok.Data;

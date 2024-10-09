@@ -18,3 +18,8 @@ knife4j:
 mybatis-plus:
   configuration:
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
+  global-config:
+    db-config:
+      logic-delete-field: deleted_time # 全局逻辑删除字段名
+      logic-delete-value: now() # 逻辑已删除值
+      logic-not-delete-value: null # 逻辑未删除值

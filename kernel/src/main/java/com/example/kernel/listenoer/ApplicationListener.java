@@ -1,10 +1,10 @@
 package com.example.kernel.listenoer;
 
+import com.example.kernel.util.InitUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
 import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.beans.factory.support.DefaultListableBeanFactory;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
 
@@ -19,7 +19,7 @@ public class ApplicationListener implements CommandLineRunner, DisposableBean {
     @Value("${spring.profiles.active}")
     private String active;
 
-    private final DefaultListableBeanFactory beanFactory;
+    private final InitUtils initUtils;
 
     /**
      * 应用启动成功后的回调
@@ -27,7 +27,7 @@ public class ApplicationListener implements CommandLineRunner, DisposableBean {
     @Override
     public void run(String... args) {
         log.info("application started success and to init data...");
-
+        initUtils.initTables();
         if ("dev".equals(active)) {
 
         }

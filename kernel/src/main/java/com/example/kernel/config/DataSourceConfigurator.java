@@ -1,7 +1,7 @@
 package com.example.kernel.config;
 
 
-import com.example.kernel.entity.Global;
+import com.example.kernel.entity.base.Global;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
