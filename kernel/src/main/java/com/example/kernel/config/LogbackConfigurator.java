@@ -7,7 +7,7 @@ import ch.qos.logback.classic.spi.LoggerContextListener;
 import ch.qos.logback.core.Context;
 import ch.qos.logback.core.spi.ContextAwareBase;
 import ch.qos.logback.core.spi.LifeCycle;
-import com.example.kernel.entity.base.Global;
+import com.example.kernel.entity.base.Constant;
 
 public class LogbackConfigurator extends ContextAwareBase implements LoggerContextListener, LifeCycle {
     private boolean started = false;
@@ -18,7 +18,7 @@ public class LogbackConfigurator extends ContextAwareBase implements LoggerConte
             return;
         }
         Context context = getContext();
-        context.putProperty("LOG_PATH", Global.logPath);
+        context.putProperty("LOG_PATH", Constant.logPath);
         started = true;
     }
 

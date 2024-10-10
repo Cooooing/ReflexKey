@@ -1,6 +1,6 @@
 package com.example.kernel.util;
 
-import com.example.kernel.entity.base.Global;
+import com.example.kernel.entity.base.Constant;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
@@ -29,12 +29,23 @@ public class InitUtils {
             runner.setLogWriter(null);
             runner.setStopOnError(true);
             Resources.setCharset(StandardCharsets.UTF_8);
-            runner.runScript(new InputStreamReader(Objects.requireNonNull(InitUtils.class.getClassLoader().getResourceAsStream(Global.sqliteInitFile)), StandardCharsets.UTF_8));
+            runner.runScript(new InputStreamReader(Objects.requireNonNull(InitUtils.class.getClassLoader().getResourceAsStream(Constant.sqliteInitFile)), StandardCharsets.UTF_8));
             conn.close();
         } catch (Exception e) {
             log.error("init tables error", e);
         }
     }
 
+    public void rebuildDataSource() {
+        log.info("rebuild datasource...");
+        try {
+            Connection conn = dataSource.getConnection();
+
+
+            conn.close();
+        } catch (Exception e) {
+            log.error("rebuild datasource error", e);
+        }
+    }
 
 }

@@ -1,7 +1,7 @@
 package com.example.kernel.config;
 
 
-import com.example.kernel.entity.base.Global;
+import com.example.kernel.entity.base.Constant;
 import org.springframework.boot.jdbc.DataSourceBuilder;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -13,7 +13,7 @@ public class DataSourceConfigurator {
 
     @Bean(name = "sqliteDataSource")
     public DataSource sqliteDataSource() {
-        return DataSourceBuilder.create().driverClassName(Global.sqliteDriverName).url(Global.sqliteUrl).build();
+        return DataSourceBuilder.create().driverClassName(Constant.sqliteDriverName).url(Constant.sqliteUrl).build();
     }
 
 

@@ -23,5 +23,5 @@ public class Entity {
     // 逻辑删除
     @TableField(value = "`deleted_time`")
     @TableLogic
-    private Integer deleted;
+    private Integer deletedTime;
 }

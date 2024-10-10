@@ -4,8 +4,12 @@ import com.baomidou.mybatisplus.annotation.TableName;
 import com.example.kernel.entity.base.Entity;
 import io.swagger.v3.oas.annotations.media.Schema;
 import lombok.Data;
+import lombok.EqualsAndHashCode;
+import lombok.experimental.Accessors;
 
 @Data
+@EqualsAndHashCode(callSuper = true)
+@Accessors(chain = true)
 @TableName("configs")
 public class Config extends Entity {
 

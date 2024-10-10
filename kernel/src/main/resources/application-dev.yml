@@ -6,7 +6,6 @@ springdoc:
       enabled: false
   packages-to-scan: com.example.kernel
 
-# knife4j的增强配置
 knife4j:
   enable: true
   setting:
@@ -14,12 +13,12 @@ knife4j:
     enable-home-custom: true
     home-custom-path: classpath:markdown/home.md
 
-# mybatis-plus配置控制台打印完整带参数SQL语句
 mybatis-plus:
   configuration:
+    call-setters-on-nulls: true
     log-impl: org.apache.ibatis.logging.stdout.StdOutImpl
   global-config:
     db-config:
       logic-delete-field: deleted_time # 全局逻辑删除字段名
-      logic-delete-value: now() # 逻辑已删除值
-      logic-not-delete-value: null # 逻辑未删除值
+      logic-delete-value: "datetime('now', 'localtime')" # 逻辑已删除值
+      logic-not-delete-value: "null" # 逻辑未删除值

@@ -8,7 +8,15 @@ spring:
   profiles:
     active: dev
 
-path:
-  workspace:
-  data:
-  log:
+
+base:
+  boot:
+    system:
+      path:
+        workspace: workspace
+      async:
+        thread-name-prefix: async-
+        core-pool-size: 5
+        max-pool-size: 50
+        keep-alive-seconds: 60
+        queue-capacity: 10000

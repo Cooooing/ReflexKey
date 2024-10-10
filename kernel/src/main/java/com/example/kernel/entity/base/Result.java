@@ -22,7 +22,7 @@ public class Result<T> {
     @Schema(description = "数据")
     private T data;
     @Schema(description = "时间戳")
-    private String time = Global.dateFormat.format(new Date());
+    private String time = Constant.dateFormat.format(new Date());
 
     public Result() {
     }
