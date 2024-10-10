@@ -21,3 +21,9 @@ mybatis-plus:
       logic-delete-field: deleted_time # 全局逻辑删除字段名
       logic-delete-value: "datetime('now', 'localtime')" # 逻辑已删除值
       logic-not-delete-value: "null" # 逻辑未删除值
+
+spring:
+  jmx:
+    enabled: false
+  main:
+    lazy-initialization: true

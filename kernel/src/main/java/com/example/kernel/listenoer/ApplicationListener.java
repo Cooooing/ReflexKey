@@ -1,5 +1,7 @@
 package com.example.kernel.listenoer;
 
+import com.example.kernel.entity.base.Constant;
+import com.example.kernel.util.FileUtils;
 import com.example.kernel.util.InitUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.log4j.Log4j2;
@@ -7,6 +9,8 @@ import org.springframework.beans.factory.DisposableBean;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.stereotype.Component;
+
+import java.io.IOException;
 
 /**
  * 监听容器启动关闭
@@ -25,15 +29,15 @@ public class ApplicationListener implements CommandLineRunner, DisposableBean {
      * 应用启动成功后的回调
      */
     @Override
-    public void run(String... args) {
-        log.info("application started success and to init data...");
+    public void run(String... args) throws IOException {
+        FileUtils.lockDirectory(Constant.workspacePath);
         initUtils.initTables();
         if ("dev".equals(active)) {
 
         }
 
 
-        log.info("application init data success");
+        log.info("application is inited");
     }
 
     /**
@@ -41,12 +45,10 @@ public class ApplicationListener implements CommandLineRunner, DisposableBean {
      */
     @Override
     public void destroy() {
-        log.info("application is closing and to close source...");
 
+        FileUtils.unlockDirectory(Constant.workspacePath);
         log.info("application is closed");
     }
-
-
 
 
 }

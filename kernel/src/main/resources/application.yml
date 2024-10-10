@@ -6,8 +6,7 @@ spring:
   application:
     name: kernel
   profiles:
-    active: dev
-
+    active: prod
 
 base:
   boot:

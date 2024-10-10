@@ -16,7 +16,7 @@ import java.util.Objects;
 @Slf4j
 @RequiredArgsConstructor
 @Component
-public class InitUtils {
+public final class InitUtils {
 
     private final DataSource dataSource;
 
@@ -39,10 +39,10 @@ public class InitUtils {
     public void rebuildDataSource() {
         log.info("rebuild datasource...");
         try {
-            Connection conn = dataSource.getConnection();
+            boolean b = FileUtils.deleteFile(Constant.sqliteFilePath);
 
 
-            conn.close();
+//            conn.close();
         } catch (Exception e) {
             log.error("rebuild datasource error", e);
         }

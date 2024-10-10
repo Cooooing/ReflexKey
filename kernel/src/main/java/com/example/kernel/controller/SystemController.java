@@ -1,7 +1,7 @@
 package com.example.kernel.controller;
 
 import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
-import com.example.kernel.entity.Config;
+import com.example.kernel.entity.po.Config;
 import com.example.kernel.entity.base.Result;
 import com.example.kernel.mapper.TestMapper;
 import com.example.kernel.service.Test;

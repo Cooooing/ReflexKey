@@ -13,7 +13,7 @@ import java.util.Map;
 
 @Slf4j
 @Component
-public class SpringContextUtil implements ApplicationContextAware {
+public final class SpringContextUtil implements ApplicationContextAware {
 
     private static ApplicationContext applicationContext;
 
@@ -24,6 +24,10 @@ public class SpringContextUtil implements ApplicationContextAware {
     @Override
     public void setApplicationContext(@NonNull ApplicationContext applicationContext) throws BeansException {
         SpringContextUtil.applicationContext = applicationContext;
+    }
+
+    public void stop() {
+        ((org.springframework.context.ConfigurableApplicationContext) applicationContext).close();
     }
 
     public Object getBean(String name) {

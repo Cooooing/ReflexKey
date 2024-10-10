@@ -1,4 +1,4 @@
-package com.example.kernel.entity;
+package com.example.kernel.entity.po;
 
 import com.baomidou.mybatisplus.annotation.TableName;
 import com.example.kernel.entity.base.Entity;

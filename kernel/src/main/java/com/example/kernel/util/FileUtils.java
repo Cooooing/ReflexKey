@@ -6,7 +6,27 @@ import java.io.File;
 import java.io.IOException;
 
 @Slf4j
-public class FileUtils {
+public final class FileUtils {
+
+    public static boolean lockDirectory(String path) throws IOException {
+        path = path + File.separator + ".lock";
+        if (isExist(path)) {
+            return false;
+        }
+        return createFile(path);
+    }
+
+    public static boolean unlockDirectory(String path) {
+        path = path + File.separator + ".lock";
+        if (!isExist(path)) {
+            return true;
+        }
+        return deleteFile(path);
+    }
+
+    public static boolean isExist(String path) {
+        return new File(path).exists();
+    }
 
     public static boolean createDirectory(String path) {
         boolean flag;
