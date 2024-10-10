@@ -24,7 +24,7 @@ public class DefinedException extends RuntimeException {
     }
 
     public DefinedException(Exception exception) {
-        this.exceptionEnum = ExceptionEnum.EXCEPTION;
+        this.exceptionEnum = ExceptionEnum.INTERNAL_SERVER_ERROR;
         this.exception = exception;
     }
 

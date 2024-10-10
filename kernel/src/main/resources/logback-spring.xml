@@ -1,5 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <configuration debug="false">
+    <statusListener class="ch.qos.logback.core.status.NopStatusListener" />
     <contextListener class="com.example.kernel.config.LogbackConfigurator"/>
 <!--    <define name="LOG_PATH" class="com.example.kernel.config.LogbackConfigurator"/>-->
     <!--0. 日志格式和颜色渲染 -->
