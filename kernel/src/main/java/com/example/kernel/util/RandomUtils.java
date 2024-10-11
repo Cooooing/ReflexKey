@@ -18,7 +18,7 @@ public final class RandomUtils {
     private static final List<Character> numbers = List.of('0', '1', '2', '3', '4', '5', '6', '7', '8', '9');
     private static final List<Character> specialChars = List.of('!', '@', '#', '$', '%', '^', '&', '*', '(', ')', '-', '_', '=', '+', '[', ']', '{', '}', '|', '\\', ';', ':', '\'', '\"', ',', '<', '.', '>', '/', '?');
 
-    private static final List<Character> shortUuidChars = Stream.of(lowerCaseChars, upperCaseChars, numbers, specialChars).flatMap(List::stream).toList();
+    private static final List<Character> shortUuidChars = Stream.of(lowerCaseChars, upperCaseChars, numbers).flatMap(List::stream).toList();
     private static final int shortUuidCharsLengthHex = Integer.parseInt(Integer.toHexString(shortUuidChars.size()), 16);
 
     public static String generateUuid() {
