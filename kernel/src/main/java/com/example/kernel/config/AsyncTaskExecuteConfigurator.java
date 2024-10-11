@@ -19,7 +19,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 @EnableAsync
 @RequiredArgsConstructor
 @Configuration
-public class AsyncTaskExecuteConfiguration implements AsyncConfigurer {
+public class AsyncTaskExecuteConfigurator implements AsyncConfigurer {
     private final AsyncTaskThreadPoolProperties config;
 
     @Override
