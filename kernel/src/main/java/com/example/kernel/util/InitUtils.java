@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.ibatis.io.Resources;
 import org.apache.ibatis.jdbc.ScriptRunner;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Component;
 
 import javax.sql.DataSource;
@@ -20,6 +21,12 @@ public final class InitUtils {
 
     private final DataSource dataSource;
 
+    @Value("${spring.profiles.active}")
+    private String active;
+
+    /**
+     * 初始化表结构
+     */
     public void initTables() {
         log.info("init tables...");
         try {
@@ -36,13 +43,17 @@ public final class InitUtils {
         }
     }
 
+    /**
+     * 重建数据库 会导致数据丢失，仅在开发环境使用
+     */
     public void rebuildDataSource() {
+        if (!"dev".equals(active)) {
+            return;
+        }
         log.info("rebuild datasource...");
         try {
-            boolean b = FileUtils.deleteFile(Constant.sqliteFilePath);
-
-
-//            conn.close();
+            FileUtils.deleteFile(Constant.sqliteFilePath);
+            initTables();
         } catch (Exception e) {
             log.error("rebuild datasource error", e);
         }

@@ -9,7 +9,7 @@ import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 
 @Slf4j
-public class Constant {
+public final class Constant {
 
     public final static String NAME = "kernel";
     public final static String VERSION = "0.0.1";
@@ -43,5 +43,10 @@ public class Constant {
     }
 
     public final static String MDC_TRACE = "tid"; // 日志追踪标识
+
+
+    // 历史记录表 类型值
+    public final static String GENERATE_PASSWORD = "generate_password";
+    public final static String CLIPBOARD = "clipboard";
 
 }

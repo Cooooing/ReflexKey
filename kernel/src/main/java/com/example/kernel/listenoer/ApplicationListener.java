@@ -31,10 +31,10 @@ public class ApplicationListener implements CommandLineRunner, DisposableBean {
     @Override
     public void run(String... args) throws IOException {
         FileUtils.lockDirectory(Constant.workspacePath);
-        initUtils.initTables();
         if ("dev".equals(active)) {
-
+            initUtils.rebuildDataSource();
         }
+        initUtils.initTables();
 
 
         log.info("application is inited");

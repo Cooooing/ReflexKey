@@ -11,8 +11,12 @@ import lombok.experimental.Accessors;
 @Data
 @EqualsAndHashCode(callSuper = true)
 @Accessors(chain = true)
-@TableName("generate_password")
-public class GeneratePassword extends Entity {
-    @Schema(description = "密码")
-    private String password;
+@TableName("history_record")
+public class HistoryRecord extends Entity {
+
+    @Schema(description = "value")
+    private String value;
+
+    @Schema(description = "类别")
+    private String type;
 }

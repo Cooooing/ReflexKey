@@ -1,12 +1,14 @@
 package com.example.kernel.controller;
 
 
+import com.baomidou.mybatisplus.core.conditions.query.LambdaQueryWrapper;
 import com.baomidou.mybatisplus.extension.plugins.pagination.Page;
+import com.example.kernel.entity.base.Constant;
 import com.example.kernel.entity.base.PageVO;
 import com.example.kernel.entity.base.Result;
-import com.example.kernel.entity.po.GeneratePassword;
+import com.example.kernel.entity.po.HistoryRecord;
 import com.example.kernel.entity.vo.GeneratePasswordQueryVO;
-import com.example.kernel.service.GeneratePasswordService;
+import com.example.kernel.service.HistoryRecordService;
 import com.example.kernel.util.RandomUtils;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
@@ -25,7 +27,7 @@ import java.util.stream.Collectors;
 @RequestMapping("/util")
 public class UtilController {
 
-    private final GeneratePasswordService generatePasswordService;
+    private final HistoryRecordService historyRecordService;
 
     @Operation(summary = "生成密码")
     @PostMapping("/generatePassword")
@@ -39,14 +41,27 @@ public class UtilController {
                     , vo.getIncludeChars().chars().mapToObj(c -> (char) c).collect(Collectors.toList())
                     , vo.getExcludeChars().chars().mapToObj(c -> (char) c).collect(Collectors.toList())));
         }
-        generatePasswordService.saveBatch(passwords.stream().map(password -> new GeneratePassword().setPassword(password)).collect(Collectors.toList()));
+        historyRecordService.saveBatch(passwords.stream().map(password -> new HistoryRecord().setType(Constant.GENERATE_PASSWORD).setValue(password)).collect(Collectors.toList()));
         return Result.success(passwords);
     }
 
     @Operation(summary = "获取生成密码历史")
     @GetMapping("/getGeneratePassword")
-    public Result<Page<GeneratePassword>> generatePassword(PageVO<GeneratePassword> pageVO) {
-        Page<GeneratePassword> page = generatePasswordService.page(pageVO.toMybatisPlusPage());
+    public Result<Page<HistoryRecord>> generatePassword(PageVO<HistoryRecord> pageVO) {
+        Page<HistoryRecord> page = historyRecordService.page(pageVO.toMybatisPlusPage(), new LambdaQueryWrapper<HistoryRecord>().eq(HistoryRecord::getType, Constant.GENERATE_PASSWORD));
+        return Result.success(page);
+    }
+
+    @Operation(summary = "添加剪贴板历史")
+    @GetMapping("/addClipboard")
+    public Result<Boolean> addClipboard(String value) {
+        return Result.simpleJudge(historyRecordService.save(new HistoryRecord().setType(Constant.CLIPBOARD).setValue(value)));
+    }
+
+    @Operation(summary = "获取剪贴板历史")
+    @GetMapping("/getClipboard")
+    public Result<Page<HistoryRecord>> getClipboard(PageVO<HistoryRecord> pageVO) {
+        Page<HistoryRecord> page = historyRecordService.page(pageVO.toMybatisPlusPage(), new LambdaQueryWrapper<HistoryRecord>().eq(HistoryRecord::getType, Constant.CLIPBOARD));
         return Result.success(page);
     }
 
