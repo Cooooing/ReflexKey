@@ -16,10 +16,14 @@ create table if not exists `configs`
 insert into `configs` (`env`, `device`, `type`, `only_read`, `key`, `value`)
 values ('all', 'all', 'database', 1, 'reflex_key_database_ver', '1');
 
-select *
-from configs
-where env = 'all'
-  and device = 'all'
-  and key = 'reflex_key_database_ver';
+-- 生成密码历史表
+create table if not exists `generate_password`
+(
+    `id`           integer primary key autoincrement not null, -- id
+    `password`     varchar(255)                      not null, -- 密码
+    `create_time`  datetime default current_timestamp,         -- 插入时间
+    `update_time`  datetime default current_timestamp,         -- 更新时间
+    `deleted_time` datetime default null                       -- 删除时间
+);
 
 

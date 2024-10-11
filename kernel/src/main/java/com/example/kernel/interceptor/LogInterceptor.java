@@ -2,7 +2,7 @@ package com.example.kernel.interceptor;
 
 
 import com.example.kernel.entity.base.Constant;
-import com.example.kernel.util.UUIDUtils;
+import com.example.kernel.util.RandomUtils;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.NonNull;
@@ -47,7 +47,7 @@ public class LogInterceptor implements HandlerInterceptor {
 
     @Override
     public boolean preHandle(@NonNull HttpServletRequest request, @NonNull HttpServletResponse response, @NonNull Object handler) {
-        MDC.put(Constant.MDC_TRACE, UUIDUtils.generateShortUuid());
+        MDC.put(Constant.MDC_TRACE, RandomUtils.generateShortUuid());
 
         // 如果是被排除的uri，不记录 access_log
         if (matchExclude(request.getRequestURI())) {
