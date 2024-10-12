@@ -1,6 +1,6 @@
 package com.example.kernel.utils;
 
-import com.example.kernel.util.RandomUtils;
+import com.example.kernel.common.util.RandomUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 

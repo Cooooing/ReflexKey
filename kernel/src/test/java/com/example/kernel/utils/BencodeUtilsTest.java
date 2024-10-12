@@ -1,7 +1,7 @@
 package com.example.kernel.utils;
 
 import com.alibaba.fastjson2.JSON;
-import com.example.kernel.util.BencodeUtils;
+import com.example.kernel.common.util.BencodeUtils;
 import lombok.extern.slf4j.Slf4j;
 import org.junit.jupiter.api.Test;
 
