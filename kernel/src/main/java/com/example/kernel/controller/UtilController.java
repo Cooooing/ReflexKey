@@ -9,8 +9,11 @@ import com.example.kernel.entity.base.Result;
 import com.example.kernel.entity.po.HistoryRecord;
 import com.example.kernel.entity.vo.GeneratePasswordQueryVO;
 import com.example.kernel.service.HistoryRecordService;
+import com.example.kernel.util.BencodeUtils;
 import com.example.kernel.util.RandomUtils;
+import com.github.xiaoymin.knife4j.annotations.DynamicParameter;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.Parameter;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -53,6 +56,7 @@ public class UtilController {
     }
 
     @Operation(summary = "添加剪贴板历史")
+    @Parameter(name = "value", description = "剪贴板内容")
     @GetMapping("/addClipboard")
     public Result<Boolean> addClipboard(String value) {
         return Result.simpleJudge(historyRecordService.save(new HistoryRecord().setType(Constant.CLIPBOARD).setValue(value)));
@@ -63,6 +67,20 @@ public class UtilController {
     public Result<Page<HistoryRecord>> getClipboard(PageVO<HistoryRecord> pageVO) {
         Page<HistoryRecord> page = historyRecordService.page(pageVO.toMybatisPlusPage(), new LambdaQueryWrapper<HistoryRecord>().eq(HistoryRecord::getType, Constant.CLIPBOARD));
         return Result.success(page);
+    }
+
+    @Operation(summary = "bencode 编码")
+    @DynamicParameter(example = "{\"nick\":\"Cooooing\",\"skill\":[\"Coding\",\"Basketball\"],\"blog\":\"https://cooooing.github.io\",\"age\":22}")
+    @PostMapping("/bencode")
+    public Result<String> bencode(@RequestBody Object obj) {
+        return Result.success(BencodeUtils.encode(obj));
+    }
+
+    @Operation(summary = "bencode 解码")
+    @DynamicParameter(example = "d4:nick8:Cooooing5:skilll6:Coding10:Basketb2alle4:blog26:https://cooooing.github.io3:agei22ee")
+    @PostMapping("/bdecode")
+    public Result<Object> bdecode(@RequestBody Object s) {
+        return Result.success(BencodeUtils.decode(s.toString().getBytes()));
     }
 
 

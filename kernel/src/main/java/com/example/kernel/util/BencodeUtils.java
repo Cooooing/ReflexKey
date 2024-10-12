@@ -1,5 +1,6 @@
 package com.example.kernel.util;
 
+import com.example.kernel.exceptionAdvice.DefinedException;
 import lombok.extern.slf4j.Slf4j;
 
 import java.util.ArrayList;
@@ -13,35 +14,44 @@ public class BencodeUtils {
     // 编码方法
     public static String encode(Object obj) {
         StringBuilder sb = new StringBuilder();
-        if (obj instanceof Map) {
-            sb.append("d");
-            Map<?, ?> map = (Map<?, ?>) obj;
-            for (Map.Entry<?, ?> entry : map.entrySet()) {
-                sb.append(encode(entry.getKey()));
-                sb.append(encode(entry.getValue()));
+        if (obj == null) {
+            return "";
+        }
+        switch (obj) {
+            case Map<?, ?> map -> {
+                sb.append("d");
+                for (Map.Entry<?, ?> entry : map.entrySet()) {
+                    sb.append(encode(entry.getKey()));
+                    sb.append(encode(entry.getValue()));
+                }
+                sb.append("e");
             }
-            sb.append("e");
-        } else if (obj instanceof Integer) {
-            sb.append("i").append(obj).append("e");
-        } else if (obj instanceof List) {
-            sb.append("l");
-            List<?> list = (List<?>) obj;
-            for (Object item : list) {
-                sb.append(encode(item));
+            case Integer ignored -> sb.append("i").append(obj).append("e");
+            case List<?> list -> {
+                sb.append("l");
+                for (Object item : list) {
+                    sb.append(encode(item));
+                }
+                sb.append("e");
             }
-            sb.append("e");
-        } else if (obj instanceof String) {
-            String str = (String) obj;
-            sb.append(str.length()).append(':').append(str);
-        } else {
-            throw new IllegalArgumentException("Unsupported type: " + obj.getClass());
+            case String str -> sb.append(str.length()).append(':').append(str);
+            case null, default -> throw new IllegalArgumentException("Unsupported type: " + obj.getClass());
         }
         return sb.toString();
     }
 
     // 解码方法
     public static Object decode(byte[] s) {
-        return decodeObject(s, 0)[0];
+        Object o = null;
+        if (s == null || s.length == 0) {
+            return o;
+        }
+        try {
+            o = decodeObject(s, 0)[0];
+        } catch (Exception e) {
+            throw new DefinedException(e);
+        }
+        return o;
     }
 
     // 辅助方法：解码对象
@@ -95,7 +105,7 @@ public class BencodeUtils {
             index++;
             return new Object[]{list, index};
         } else {
-            throw new IllegalArgumentException("Invalid Bencode format at index " + index);
+            throw new IllegalArgumentException(String.format("Invalid Bencode format %s at index %d", b, index));
         }
     }
 }
