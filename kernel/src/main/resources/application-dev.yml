@@ -12,6 +12,7 @@ knife4j:
     language: zh_cn
     enable-home-custom: true
     home-custom-path: classpath:markdown/home.md
+    enable-dynamic-parameter: true
 
 mybatis-plus:
   configuration:

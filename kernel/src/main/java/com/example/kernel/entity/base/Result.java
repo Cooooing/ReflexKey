@@ -41,7 +41,7 @@ public class Result<T> {
         this.data = data;
     }
 
-    public Result(boolean success, ExceptionEnum exceptionEnum) {
+    public Result(Boolean success, ExceptionEnum exceptionEnum) {
         this.success = success;
         this.code = exceptionEnum.getKey();
         this.message = exceptionEnum.getValue();
@@ -54,8 +54,9 @@ public class Result<T> {
         this.data = data;
     }
 
-    public Result(Boolean success, String message) {
+    public Result(Boolean success, Integer code, String message) {
         this.success = success;
+        this.code = code;
         this.message = message;
     }
 
@@ -68,7 +69,7 @@ public class Result<T> {
     }
 
     public static <T> Result<T> error(Exception e) {
-        return new Result<>(false, e.getMessage());
+        return new Result<>(false, ExceptionEnum.INTERNAL_SERVER_ERROR.getKey(), e.getMessage());
     }
 
     public static <T> Result<T> success(ResultEnum resultEnum) {

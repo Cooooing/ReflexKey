@@ -28,10 +28,14 @@ public class ExceptionAdvice {
     public Result<Object> definedExceptionAdvice(DefinedException e) {
         if (e.getException() == null) {
             log.error(e.getMessage(), e);
+            return Result.error(e.getExceptionEnum());
         } else {
             log.error(e.getException().getMessage(), e.getException());
+            if ("dev".equals(active)) {
+                return Result.error(e);
+            }
+            return Result.error(ExceptionEnum.INTERNAL_SERVER_ERROR);
         }
-        return Result.error(e);
     }
 
     @ExceptionHandler(NoResourceFoundException.class)
