@@ -2,47 +2,91 @@ package com.example.kernel.p2p.torrent;
 
 import com.alibaba.fastjson2.JSON;
 import com.example.kernel.common.exceptionAdvice.DefinedException;
+import com.example.kernel.common.util.BencodeUtils;
+import com.example.kernel.common.util.FileUtils;
+import com.example.kernel.p2p.entity.TorrentInfo;
 import com.example.kernel.p2p.entity.Torrent;
+import com.example.kernel.p2p.entity.TorrentInfoFiles;
+import lombok.Data;
 import lombok.extern.slf4j.Slf4j;
 
 import java.io.IOException;
 import java.nio.file.Files;
+import java.nio.file.Path;
 import java.nio.file.Paths;
 import java.util.*;
 
 @Slf4j
+@Data
 public class TorrentFileResolver {
 
+    private String directoryName;
+    private Path path;
+    private List<Path> paths;
+    private Torrent torrent;
+    private boolean isSingleFile = false;
     private byte[] torrentBytes;
     private int infoStart;
     private int infoEnd;
-    private Torrent result;
 
     private TorrentFileResolver() {
     }
 
-    public static TorrentFileResolver init(String path) throws IOException {
-        TorrentFileResolver resolver = new TorrentFileResolver();
-        resolver.torrentBytes = Files.readAllBytes(Paths.get(path));
-        resolver.infoStart = 0;
-        resolver.infoEnd = 0;
-        return resolver;
+    /**
+     * 读取torrent文件
+     */
+    public TorrentFileResolver(String path) throws IOException {
+        this.path = Paths.get(path).toAbsolutePath().normalize();
+        this.torrentBytes = Files.readAllBytes(this.path);
+        this.infoStart = 0;
+        this.infoEnd = 0;
+    }
+
+    /**
+     * 生成torrent文件
+     */
+    public TorrentFileResolver(List<String> paths) {
+        this.paths = paths.stream().map(i -> Paths.get(i).toAbsolutePath().normalize()).toList();
+        this.torrentBytes = encode();
+        this.infoStart = 0;
+        this.infoEnd = 0;
+        this.torrent = new Torrent();
+        this.isSingleFile = this.paths.size() == 1;
     }
 
     public Torrent read() {
-        if (result != null) {
-            return result;
+        if (torrent != null) {
+            return torrent;
         }
-        result = JSON.parseObject(JSON.toJSONString(decode(torrentBytes)), Torrent.class);
+        String jsonString = JSON.toJSONString(decode(torrentBytes));
+        torrent = JSON.parseObject(jsonString, Torrent.class);
+        log.info("torrent info:{}", jsonString);
         byte[] infoByte = new byte[infoEnd - infoStart + 1];
         System.arraycopy(torrentBytes, infoStart, infoByte, 0, infoEnd - infoStart + 1);
-        result.setInfoBencode(infoByte);
-        return result;
+        isSingleFile = torrent.getTorrentInfo().getFiles() == null;
+        torrent.setInfoBencode(infoByte);
+        torrent.setPath(path);
+        torrent.hash();
+        return torrent;
     }
 
     // Todo 生成torrent文件
-    public void write(String path) {
+    public void write(String path) throws IOException {
+        Path normalizePath = Paths.get(path.endsWith(".torrent") ? path : path + ".torrent").toAbsolutePath().normalize();
+        FileUtils.createFile(normalizePath);
+        torrent.setPath(normalizePath);
+        TorrentInfo torrentInfo = new TorrentInfo();
+        if (isSingleFile){
 
+        }else {
+
+        }
+    }
+
+    private byte[] CalculatePieces() {
+//        torrent.getin
+
+        return null;
     }
 
     private Object decode(byte[] s) {
@@ -124,7 +168,36 @@ public class TorrentFileResolver {
 
     // Todo 将torrent进行编码
     private byte[] encode() {
-        return null;
+        HashMap<String, Object> torrent = new HashMap<>();
+        torrent.put("announce", this.torrent.getAnnounce());
+        torrent.put("announce-list", this.torrent.getAnnounce() == null ? null : this.torrent.getAnnounceList());
+
+        HashMap<String, Object> info = new HashMap<>();
+        info.put("name", this.torrent.getTorrentInfo().getName());
+        info.put("piece length", this.torrent.getTorrentInfo().getPieceLength());
+        info.put("pieces", this.torrent.getTorrentInfo().getPieces());
+        if (this.isSingleFile) {
+            info.put("length", this.torrent.getTorrentInfo().getLength());
+        } else {
+            List<HashMap<String, Object>> files = new ArrayList<>();
+            for (TorrentInfoFiles file : this.torrent.getTorrentInfo().getFiles()) {
+                HashMap<String, Object> fileInfo = new HashMap<>();
+                fileInfo.put("length", file.getLength());
+                fileInfo.put("path", file.getPath());
+                files.add(fileInfo);
+            }
+            info.put("files", files);
+        }
+        torrent.put("info", info);
+
+        torrent.put("comment", this.torrent.getComment() == null ? null : this.torrent.getComment());
+        torrent.put("created by", this.torrent.getCreatedBy() == null ? null : this.torrent.getCreatedBy());
+        torrent.put("creation date", this.torrent.getCreationDate() == null ? null : this.torrent.getCreationDate());
+        torrent.put("encoding", this.torrent.getEncoding() == null ? null : this.torrent.getEncoding());
+        torrent.put("publisher", this.torrent.getPublisher() == null ? null : this.torrent.getPublisher());
+        torrent.put("publisher-url", this.torrent.getPublisherUrl() == null ? null : this.torrent.getPublisherUrl());
+        torrent.put("url-list", this.torrent.getUrlList() == null ? null : this.torrent.getUrlList());
+        return BencodeUtils.encode(torrent).getBytes();
     }
 
 }

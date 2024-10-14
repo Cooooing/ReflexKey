@@ -3,6 +3,9 @@ package com.example.kernel.common.util;
 import lombok.extern.slf4j.Slf4j;
 import org.apache.tomcat.util.buf.HexUtils;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.security.MessageDigest;
 
 @Slf4j
@@ -25,28 +28,49 @@ public final class DigestUtils {
         }
     }
 
-    public static String toSHA1(String arg0) {
-        return HexUtils.toHexString(sha1.digest(arg0.getBytes()));
+    public static byte[] toSHA1(File arg0) {
+        try (FileInputStream fis = new FileInputStream(arg0)) {
+            byte[] buffer = new byte[8192];
+            int bytesRead;
+            while ((bytesRead = fis.read(buffer)) != -1) {
+                sha1.update(buffer, 0, bytesRead);
+            }
+        } catch (IOException e) {
+            throw new RuntimeException(e);
+        }
+        return sha1.digest();
     }
 
-    public static String toSHA1(byte[] arg0) {
-        return HexUtils.toHexString(sha1.digest(arg0));
+    public static byte[] toSHA1(String arg0) {
+        return sha1.digest(arg0.getBytes());
     }
 
-    public static String toSHA256(String arg0) {
-        return HexUtils.toHexString(sha256.digest(arg0.getBytes()));
+    public static byte[] toSHA1(byte[] arg0) {
+        return sha1.digest(arg0);
     }
 
-    public static String toSHA256(byte[] arg0) {
-        return HexUtils.toHexString(sha256.digest(arg0));
+    public static byte[] toSHA256(String arg0) {
+        return sha256.digest(arg0.getBytes());
     }
 
-    public static String toMD5(String arg0) {
-        return HexUtils.toHexString(md5.digest(arg0.getBytes()));
+    public static byte[] toSHA256(byte[] arg0) {
+        return sha256.digest(arg0);
     }
 
-    public static String toMD5(byte[] arg0) {
-        return HexUtils.toHexString(md5.digest(arg0));
+    public static byte[] toMD5(String arg0) {
+        return md5.digest(arg0.getBytes());
+    }
+
+    public static byte[] toMD5(byte[] arg0) {
+        return md5.digest(arg0);
+    }
+
+    public static String toHexString(String arg0) {
+        return HexUtils.toHexString(arg0.getBytes());
+    }
+
+    public static String toHexString(byte[] arg0) {
+        return HexUtils.toHexString(arg0);
     }
 
 }

@@ -4,6 +4,7 @@ import lombok.extern.slf4j.Slf4j;
 
 import java.io.File;
 import java.io.IOException;
+import java.nio.file.Path;
 
 @Slf4j
 public final class FileUtils {
@@ -40,6 +41,10 @@ public final class FileUtils {
         return flag;
     }
 
+    public static boolean createDirectory(Path path) {
+        return createDirectory(path.toString());
+    }
+
     public static boolean createFile(String path) throws IOException {
         boolean flag = false;
         File file = new File(path);
@@ -50,6 +55,10 @@ public final class FileUtils {
             }
         }
         return flag;
+    }
+
+    public static boolean createFile(Path path) throws IOException {
+        return createFile(path.toString());
     }
 
     public static boolean deleteFile(String path) {

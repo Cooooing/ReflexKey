@@ -1,4 +1,4 @@
-package com.example.kernel.utils;
+package com.example.kernel.common.utils;
 
 import com.example.kernel.common.util.RandomUtils;
 import lombok.extern.slf4j.Slf4j;

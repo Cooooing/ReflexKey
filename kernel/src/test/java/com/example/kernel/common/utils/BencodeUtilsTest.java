@@ -1,4 +1,4 @@
-package com.example.kernel.utils;
+package com.example.kernel.common.utils;
 
 import com.alibaba.fastjson2.JSON;
 import com.example.kernel.common.util.BencodeUtils;
