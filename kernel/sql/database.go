@@ -1,12 +1,14 @@
 package sql
 
 import (
+	_ "embed"
+	"kernel/conf"
+
 	//_ "github.com/mattn/go-sqlite3"
 	"gorm.io/driver/sqlite"
 	"gorm.io/gorm"
 	"kernel/common"
 	"kernel/model"
-	"kernel/util"
 	"os"
 	"reflect"
 	"runtime"
@@ -14,6 +16,9 @@ import (
 	"strings"
 	"sync"
 )
+
+//go:embed init.sql
+var initSql string
 
 var DB *gorm.DB
 
@@ -24,28 +29,10 @@ func InitDatabase(forceRebuild bool) (err error) {
 	defer initDatabaseLock.Unlock()
 
 	initDBConnection()
-
-	if !forceRebuild {
-		// 检查数据库结构版本，如果版本不一致的话说明改过表结构，需要重建
-		if model.DatabaseVer == getDatabaseVer() {
-			return
-		}
-		common.Log.Info("the database structure is changed, rebuilding database...")
-	}
-
-	// 不存在库或者版本不一致都会走到这里
-	_ = closeDatabase()
-	if common.File.IsExist(util.DBPath) {
-		if err = removeDatabaseFile(); nil != err {
-			common.Log.Error("remove database file [%s] failed: %s", util.DBPath, err)
-			err = nil
-		}
-	}
-
-	initDBConnection()
 	initDBTables()
 
-	common.Log.Info("reinitialized database [%s]", util.DBPath)
+	conf.DatabaseVersion = getDatabaseVer()
+	common.Log.Info("initialized database [%s] version [%s]", conf.DBPath, conf.DatabaseVersion)
 	return
 }
 
@@ -55,7 +42,7 @@ func initDBConnection() {
 	}
 
 	var err error
-	dsn := util.DBPath + "?_journal_mode=WAL" +
+	dsn := conf.DBPath + "?_journal_mode=WAL" +
 		"&_synchronous=OFF" +
 		"&_mmap_size=2684354560" +
 		"&_secure_delete=OFF" +
@@ -89,15 +76,15 @@ func closeDatabase() (err error) {
 }
 
 func removeDatabaseFile() (err error) {
-	err = os.RemoveAll(util.DBPath)
+	err = os.RemoveAll(conf.DBPath)
 	if nil != err {
 		return
 	}
-	err = os.RemoveAll(util.DBPath + "-shm")
+	err = os.RemoveAll(conf.DBPath + "-shm")
 	if nil != err {
 		return
 	}
-	err = os.RemoveAll(util.DBPath + "-wal")
+	err = os.RemoveAll(conf.DBPath + "-wal")
 	if nil != err {
 		return
 	}
@@ -105,9 +92,7 @@ func removeDatabaseFile() (err error) {
 }
 
 func initDBTables() {
-	sql :=
-		``
-	DB.Exec(sql)
+	DB.Exec(initSql)
 }
 
 func InsertOrUpdate() {

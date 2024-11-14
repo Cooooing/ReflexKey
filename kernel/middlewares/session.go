@@ -4,8 +4,8 @@ import (
 	"fmt"
 	"github.com/gin-gonic/gin"
 	"kernel/common"
+	"kernel/conf"
 	"kernel/model"
-	"kernel/util"
 	"net/http"
 	"time"
 )
@@ -33,7 +33,7 @@ func Recover(c *gin.Context) {
 	defer func() {
 		if e := recover(); nil != e {
 			common.Log.RecoverError(e)
-			if util.Dev == util.Mode {
+			if conf.Dev == conf.Mode {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, model.Fail(fmt.Sprintf("%v", e)))
 			} else {
 				c.AbortWithStatusJSON(http.StatusInternalServerError, model.Fail("Internal Server Error"))

@@ -9,17 +9,15 @@ import (
 	"kernel/common"
 	"kernel/conf"
 	"kernel/middlewares"
-	"kernel/util"
 	"net"
 	"net/http"
-	"net/http/pprof"
 	"net/url"
 	"os"
 	"time"
 )
 
 func Start() {
-	if util.ServerIsRunning {
+	if conf.ServerIsRunning {
 		return
 	}
 
@@ -33,17 +31,16 @@ func Start() {
 		middlewares.CorsMiddleware, // 后端服务支持 CORS 预检请求验证
 	)
 
-	serveDebug(ginServer)
 	api.ServeAPI(ginServer)
 
 	var host string
-	if conf.Conf.System.NetworkServe {
+	if conf.Conf.NetworkServe {
 		host = "0.0.0.0"
 	} else {
 		host = "127.0.0.1"
 	}
 
-	ln, err := net.Listen("tcp", host+":"+util.ServerPort)
+	ln, err := net.Listen("tcp", host+":"+conf.ServerPort)
 	if nil != err {
 		common.Log.Error("boot kernel failed: %s", err)
 	}
@@ -52,9 +49,9 @@ func Start() {
 	if nil != err {
 		common.Log.Error("boot kernel failed: %s", err)
 	}
-	util.ServerPort = port
+	conf.ServerPort = port
 
-	util.ServerURL, err = url.Parse("http://127.0.0.1:" + port)
+	conf.ServerURL, err = url.Parse("http://127.0.0.1:" + port)
 	if err != nil {
 		common.Log.Error("parse server url failed: %s", err)
 	}
@@ -72,19 +69,19 @@ func Start() {
 	//	// 反代服务器启动失败不影响核心服务器启动
 	//}()
 
-	util.Server = &http.Server{
+	conf.Server = &http.Server{
 		Addr:    host + ":" + port,
 		Handler: ginServer,
 	}
 
 	go func() {
-		if err = util.Server.Serve(ln); nil != err && !errors.Is(http.ErrServerClosed, err) {
-			util.ServerIsRunning = false
+		if err = conf.Server.Serve(ln); nil != err && !errors.Is(http.ErrServerClosed, err) {
+			conf.ServerIsRunning = false
 			common.Log.Fatal(common.ExitCodeUnavailablePort, "boot kernel failed: %s", err)
 		}
 	}()
 
-	util.ServerIsRunning = true
+	conf.ServerIsRunning = true
 	common.Log.Info("http server started")
 }
 
@@ -97,33 +94,14 @@ func Stop() {
 
 	// 关闭 HTTP Server
 	// 5秒内优雅关闭服务（将未处理完的请求处理完再关闭服务），超过5秒就超时退出
-	if err := util.Server.Shutdown(ctx); err != nil {
+	if err := conf.Server.Shutdown(ctx); err != nil {
 		common.Log.Fatal(0, "server shutdown:", err)
 	}
-	util.ServerIsRunning = false
+	conf.ServerIsRunning = false
 	common.Log.Info("server exited")
 }
 
 func Restart() {
 	Stop()
 	Start()
-}
-
-// serveDebug 生产模式下关闭 pprof
-func serveDebug(ginServer *gin.Engine) {
-	if util.Prod == util.Mode {
-		return
-	}
-
-	ginServer.GET("/debug/pprof/", gin.WrapF(pprof.Index))
-	ginServer.GET("/debug/pprof/allocs", gin.WrapF(pprof.Index))
-	ginServer.GET("/debug/pprof/block", gin.WrapF(pprof.Index))
-	ginServer.GET("/debug/pprof/goroutine", gin.WrapF(pprof.Index))
-	ginServer.GET("/debug/pprof/heap", gin.WrapF(pprof.Index))
-	ginServer.GET("/debug/pprof/mutex", gin.WrapF(pprof.Index))
-	ginServer.GET("/debug/pprof/threadcreate", gin.WrapF(pprof.Index))
-	ginServer.GET("/debug/pprof/cmdline", gin.WrapF(pprof.Cmdline))
-	ginServer.GET("/debug/pprof/profile", gin.WrapF(pprof.Profile))
-	ginServer.GET("/debug/pprof/symbol", gin.WrapF(pprof.Symbol))
-	ginServer.GET("/debug/pprof/trace", gin.WrapF(pprof.Trace))
 }

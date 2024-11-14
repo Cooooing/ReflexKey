@@ -3,6 +3,7 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"kernel/common"
+	"kernel/conf"
 	"kernel/model"
 	"kernel/sql"
 	"net/http"
@@ -14,6 +15,10 @@ func notFound(c *gin.Context) {
 
 func ping(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success("pong"))
+}
+
+func databaseVersion(c *gin.Context) {
+	c.JSON(http.StatusOK, model.Success(conf.DatabaseVersion))
 }
 
 func db(c *gin.Context) {

@@ -7,8 +7,8 @@ require (
 	github.com/denisbrodbeck/machineid v1.0.1
 	github.com/gin-gonic/gin v1.10.0
 	github.com/gofrs/flock v0.12.1
+	github.com/google/uuid v1.6.0
 	github.com/shirou/gopsutil/v3 v3.24.5
-	golang.org/x/mod v0.21.0
 	gorm.io/driver/sqlite v1.5.6
 	gorm.io/gorm v1.25.12
 )
