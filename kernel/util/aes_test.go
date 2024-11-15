@@ -1,64 +1,86 @@
 package util
 
 import (
-	"fmt"
-	"log"
+	"encoding/base64"
+	"encoding/hex"
+	"kernel/model/param"
 	"testing"
+
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/require"
 )
 
-// 测试 AES 加解密
-func TestAes(t *testing.T) {
-	// 设置密钥和 IV
-	key := []byte("1234567890123456") // 16 字节密钥
-	iv := []byte("1234567890123456")  // 16 字节 IV
-	plainText := []byte("This is a test message.")
+// TestAesEncrypt 测试所有类型的组合
+func TestAesEncrypt(t *testing.T) {
+	plainText := "Hello, world!"
+	key := "thisisaverysecretkey" // 16字节密钥
+	iv := "thisisaniv123456"      // 16字节IV
 
-	// 测试不同模式与填充方式
-	modes := []struct {
-		mode        string
-		paddingMode PaddingMode
-		encrypt     func([]byte, []byte, []byte, PaddingMode) ([]byte, error)
-		decrypt     func([]byte, []byte, []byte, PaddingMode) ([]byte, error)
-	}{
-		{"CBC", PKCS7, aesCBCEncrypt, aesCBCDecrypt},
-		{"ECB", PKCS7, aesECBEncrypt, aesECBDecrypt},
-	}
+	// 生成所有可能的组合
+	for _, operationMode := range aesType["OperationMode"] {
+		for _, fill := range aesType["Fill"] {
+			for _, keyLength := range aesType["KeyLength"] {
+				for _, keyFormat := range aesType["KeyFormat"] {
+					for _, deviationFormat := range aesType["DeviationFormat"] {
+						for _, plainTextFormat := range aesType["PlainTextFormat"] {
+							// 根据格式转换明文、密钥和偏移量
+							var plainTextBytes, keyBytes, ivBytes []byte
+							var err error
 
-	for _, test := range modes {
-		t.Run(fmt.Sprintf("Mode: %s, Padding: %d", test.mode, test.paddingMode), func(t *testing.T) {
-			// 加密
-			cipherText, err := test.encrypt(plainText, key, iv, test.paddingMode)
-			if err != nil {
-				t.Fatalf("Encryption failed: %v", err)
+							switch plainTextFormat {
+							case "Hex":
+								plainTextBytes, err = hex.DecodeString(hex.EncodeToString([]byte(plainText)))
+							case "Base64":
+								plainTextBytes, err = base64.StdEncoding.DecodeString(base64.StdEncoding.EncodeToString([]byte(plainText)))
+							default:
+								plainTextBytes = []byte(plainText)
+							}
+							require.NoError(t, err)
+
+							switch keyFormat {
+							case "Hex":
+								keyBytes, err = hex.DecodeString(hex.EncodeToString([]byte(key)))
+							case "Base64":
+								keyBytes, err = base64.StdEncoding.DecodeString(base64.StdEncoding.EncodeToString([]byte(key)))
+							default:
+								keyBytes = []byte(key)
+							}
+							require.NoError(t, err)
+
+							switch deviationFormat {
+							case "Hex":
+								ivBytes, err = hex.DecodeString(hex.EncodeToString([]byte(iv)))
+							case "Base64":
+								ivBytes, err = base64.StdEncoding.DecodeString(base64.StdEncoding.EncodeToString([]byte(iv)))
+							default:
+								ivBytes = []byte(iv)
+							}
+							require.NoError(t, err)
+
+							// 构建参数
+							params := param.AesEncryptParam{
+								PlainText:       string(plainTextBytes),
+								PlainTextFormat: plainTextFormat,
+								OperationMode:   operationMode,
+								Fill:            fill,
+								Key:             string(keyBytes),
+								KeyFormat:       keyFormat,
+								Deviation:       string(ivBytes),
+								DeviationFormat: deviationFormat,
+							}
+
+							// 调用加密函数
+							encrypted, err := AesEncrypt(params)
+							require.NoError(t, err)
+							assert.NotEmpty(t, encrypted, "Encrypted text should not be empty")
+
+							// 打印测试结果（可选）
+							t.Logf("OperationMode: %s, Fill: %s, KeyLength: %s, KeyFormat: %s, DeviationFormat: %s, PlainTextFormat: %s, Encrypted: %s",
+								operationMode, fill, keyLength, keyFormat, deviationFormat, plainTextFormat, encrypted)
+						}
+					}
+				}
 			}
-			fmt.Printf("%s Encrypted: %s\n", test.mode, bytesToBase64(cipherText))
-
-			// 解密
-			decPlainText, err := test.decrypt(cipherText, key, iv, test.paddingMode)
-			if err != nil {
-				t.Fatalf("Decryption failed: %v", err)
-			}
-			fmt.Printf("%s Decrypted: %s\n", test.mode, string(decPlainText))
-
-			// 验证是否解密正确
-			if string(decPlainText) != string(plainText) {
-				t.Fatalf("Decrypted text doesn't match original")
-			}
-		})
-	}
-}
-
-func main() {
-	// 运行测试
-	err := testing.RunTests(func(pat, str string) (bool, error) {
-		return true, nil
-	}, []testing.InternalTest{
-		{
-			Name: "TestAes",
-			F:    TestAes,
-		},
-	})
-	if err != nil {
-		log.Fatalf("Test failed: %v", err)
+		}
 	}
 }

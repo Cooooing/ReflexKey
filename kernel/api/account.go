@@ -3,12 +3,13 @@ package api
 import (
 	"github.com/gin-gonic/gin"
 	"kernel/model"
+	"kernel/model/entity"
 	"kernel/sql"
 	"net/http"
 )
 
 func addAccount(c *gin.Context) {
-	var account model.Account
+	var account entity.Account
 	if err := c.ShouldBindJSON(&account); err != nil {
 		c.JSON(http.StatusBadRequest, model.BadRequest())
 		return

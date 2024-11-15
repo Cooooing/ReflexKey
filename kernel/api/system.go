@@ -5,6 +5,7 @@ import (
 	"kernel/common"
 	"kernel/conf"
 	"kernel/model"
+	"kernel/model/entity"
 	"kernel/sql"
 	"net/http"
 )
@@ -28,7 +29,7 @@ func db(c *gin.Context) {
 	page := int64(arg["page"].(float64))
 	size := int64(arg["size"].(float64))
 
-	var scan []model.Config
+	var scan []entity.Config
 	list := sql.QueryForPage(page, size, &scan, s)
 	common.Log.Info("list: %v", list)
 	c.JSON(http.StatusOK, model.Success(list))
