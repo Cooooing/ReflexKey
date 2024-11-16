@@ -1,12 +1,9 @@
-import { createApp } from 'vue'
-import App from './App.vue'
+import { createApp } from "vue";
+import App from "./App.vue";
+import router from "./router";
+import store from "./store";
 
-import { provideFluentDesignSystem, fluentCard, fluentButton } from '@fluentui/web-components'
-
-provideFluentDesignSystem().register(fluentCard(), fluentButton())
-
-const app = createApp(App)
-
-
-app.mount('#app')
-
+const app = createApp(App);
+app.use(store);
+app.use(router);
+app.mount("#app");

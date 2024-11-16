@@ -45,7 +45,8 @@ func Recover(c *gin.Context) {
 
 // CorsMiddleware 配置跨域请求
 func CorsMiddleware(c *gin.Context) {
-	c.Header("Access-Control-Allow-Origin", "*")
+	origin := c.GetHeader("Origin")
+	c.Header("Access-Control-Allow-Origin", origin)
 	c.Header("Access-Control-Allow-Credentials", "true")
 	c.Header("Access-Control-Allow-Headers", "origin, Content-Length, Content-Type, Authorization")
 	c.Header("Access-Control-Allow-Methods", "GET, POST, PUT, PATCH, DELETE, HEAD, OPTIONS")

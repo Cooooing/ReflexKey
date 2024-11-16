@@ -17,7 +17,7 @@ import (
 var aesType = map[string][]string{
 	"OperationMode":    {"CBC", "ECB", "OFB", "CFB", "CTS", "CTR", "GCM"},
 	"Fill":             {"PKCS7", "Zeros", "No"},
-	"KeyLength":        {"128", "192", "256"},
+	"KeyLength":        {"16", "24", "32"},
 	"KeyFormat":        {"Hex", "Base64", "Text"},
 	"DeviationFormat":  {"Hex", "Base64", "Text"},
 	"PlainTextFormat":  {"Hex", "Base64"},
@@ -34,11 +34,7 @@ func AesEncrypt(params param.AesEncryptParam) (string, error) {
 	if len(params.PlainText) == 0 {
 		return "", errors.New("plainText can not be empty")
 	}
-
 	plainText := []byte(params.PlainText)
-	if !slices.Contains(aesType["KeyLength"], strconv.Itoa(len([]byte(params.Key)))) {
-		return "", errors.New("invalid aes key length")
-	}
 
 	var key []byte
 	keyFormat := params.KeyFormat
@@ -46,22 +42,39 @@ func AesEncrypt(params param.AesEncryptParam) (string, error) {
 		keyFormat = "Text"
 	}
 	switch keyFormat {
-	case "Hex":
-		key = []byte(params.Key)
 	case "Text":
+		key = []byte(params.Key)
+	case "Base64":
+		key, err = base64.StdEncoding.DecodeString(params.Deviation)
+		if nil != err {
+			return "", err
+		}
+	case "Hex":
 		key, err = hex.DecodeString(params.Key)
-		return "", err
+		if nil != err {
+			return "", err
+		}
+	}
+	if !slices.Contains(aesType["KeyLength"], strconv.Itoa(len([]byte(params.Key)))) {
+		return "", errors.New("invalid aes key length")
 	}
 
 	// ECB 模式不使用初始化向量（IV）
 	var deviation []byte
 	if params.OperationMode != "ECB" && slices.Contains(aesType["DeviationFormat"], params.DeviationFormat) {
 		switch params.DeviationFormat {
-		case "Hex":
-			deviation = []byte(params.Deviation)
 		case "Text":
+			deviation = []byte(params.Deviation)
+		case "Base64":
+			deviation, err = base64.StdEncoding.DecodeString(params.Deviation)
+			if nil != err {
+				return "", err
+			}
+		case "Hex":
 			deviation, err = hex.DecodeString(params.Deviation)
-			return "", err
+			if nil != err {
+				return "", err
+			}
 		}
 		// GCM 模式IV可以有不同的长度，但最常见的长度是12字节96bits（可以简化实现并提高效率）。
 		if params.OperationMode == "GCM" && len(deviation) != 12 {
@@ -71,6 +84,8 @@ func AesEncrypt(params param.AesEncryptParam) (string, error) {
 		if len(deviation) != 16 {
 			return "", errors.New("invalid aes deviation length")
 		}
+	} else if params.OperationMode == "ECB" {
+
 	} else {
 		return "", errors.New("invalid aes deviation")
 	}
