@@ -22,6 +22,44 @@
           </button>
         </div>
       </div>
+      <div class="search-bar">
+        <div class="search-input-wrapper">
+          <i class="iconfont icon-search"></i>
+          <input
+            type="text"
+            v-model="searchText"
+            placeholder="搜索..."
+            @keydown.enter="findNext"
+            @keydown.esc="clearSearch"
+          />
+          <div class="search-actions">
+            <button
+              v-if="searchText"
+              class="search-btn"
+              @click="clearSearch"
+              title="清除搜索"
+            >
+              <i class="iconfont icon-close-bold"></i>
+            </button>
+            <button
+              class="search-btn"
+              @click="findPrevious"
+              title="上一个"
+              :disabled="!searchText"
+            >
+              <i class="iconfont icon-arrow-up-bold"></i>
+            </button>
+            <button
+              class="search-btn"
+              @click="findNext"
+              title="下一个"
+              :disabled="!searchText"
+            >
+              <i class="iconfont icon-arrow-down-bold"></i>
+            </button>
+          </div>
+        </div>
+      </div>
       <VAceEditor
         v-model:value="content"
         :lang="'json'"
@@ -43,25 +81,40 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, computed, watch, onMounted } from "vue";
 import { VAceEditor } from "vue3-ace-editor";
 import { useStore } from "vuex";
 import "ace-builds/src-noconflict/mode-json";
 import "ace-builds/src-noconflict/theme-chrome";
 import "ace-builds/src-noconflict/theme-dracula";
+import * as ace from "ace-builds";
 import { Message } from "@/components/Message";
 
 const store = useStore();
-const content = ref("");
 const editor = ref();
-const isExpanded = ref(true);
 let isFormatting = false;
 let lastContent = "";
 let isToggling = false;
 
+// 使用 computed 属性连接 Vuex 状态
+const content = computed({
+  get: () => store.getters["jsonEditor/getContent"],
+  set: (value) => store.dispatch("jsonEditor/updateContent", value),
+});
+
+const isExpanded = computed({
+  get: () => store.getters["jsonEditor/getIsExpanded"],
+  set: (value) => store.dispatch("jsonEditor/updateExpanded", value),
+});
+
 const editorTheme = computed(() => {
   const currentTheme = store.getters["theme/currentTheme"];
   return currentTheme === "light" ? "chrome" : "dracula";
+});
+
+// 初始化时从 store 加载状态
+onMounted(() => {
+  lastContent = content.value;
 });
 
 const editorInit = (editorInstance: unknown) => {
@@ -126,9 +179,9 @@ const toggleExpand = () => {
     if (isExpanded.value) {
       // 收起：使用编辑器的折叠功能
       const session = editor.value.getSession();
-      const range = session.getFoldWidgetRange(0); // 获取第一行的折叠范围
+      const range = session.getFoldWidgetRange(0);
       if (range) {
-        session.addFold("", range); // 添加折叠
+        session.addFold("", range);
       }
     } else {
       // 展开：展开所有折叠
@@ -149,8 +202,8 @@ const toggleExpand = () => {
 
 // 清空内容
 const clearInput = () => {
-  content.value = "";
-  lastContent = ""; // 重置 lastContent
+  store.dispatch("jsonEditor/clearEditor");
+  lastContent = "";
   Message.info("内容已清空");
 };
 
@@ -163,6 +216,112 @@ const copyContent = async () => {
     Message.error("复制失败");
   }
 };
+
+const searchText = ref("");
+let searchRange: any = null;
+
+// 搜索相关方法
+const findNext = () => {
+  if (!searchText.value || !editor.value) return;
+
+  const editorInstance = editor.value;
+
+  // 如果是新的搜索词，重新初始化搜索
+  if (!searchRange || editorInstance.getSelectedText() !== searchText.value) {
+    editorInstance.clearSelection();
+
+    // 设置搜索选项
+    const searchOptions = {
+      needle: searchText.value,
+      caseSensitive: false,
+      wholeWord: false,
+      regExp: false,
+      preventScroll: false,
+    };
+
+    // 清除之前的标记
+    const markers = editorInstance.session.getMarkers();
+    if (markers) {
+      Object.keys(markers).forEach((markerId) => {
+        editorInstance.session.removeMarker(Number(markerId));
+      });
+    }
+
+    // 查找所有匹配项并高亮
+    const Range = ace.require("ace/range").Range;
+    const doc = editorInstance.session.getDocument();
+    const lines = doc.getAllLines();
+
+    lines.forEach((line, row) => {
+      let match;
+      const searchRegex = new RegExp(searchText.value, "gi");
+
+      while ((match = searchRegex.exec(line)) !== null) {
+        const range = new Range(
+          row,
+          match.index,
+          row,
+          match.index + match[0].length
+        );
+        editorInstance.session.addMarker(
+          range,
+          "ace_selected-word",
+          "text",
+          false
+        );
+      }
+    });
+
+    // 设置当前搜索
+    editorInstance.$search.set(searchOptions);
+  }
+
+  // 移动到下一个匹配项
+  editorInstance.findNext({
+    skipCurrent: true,
+    wrap: true,
+  });
+};
+
+const findPrevious = () => {
+  if (!searchText.value || !editor.value) return;
+
+  const editorInstance = editor.value;
+  editorInstance.findPrevious({
+    skipCurrent: true,
+    wrap: true,
+  });
+};
+
+const clearSearch = () => {
+  if (!editor.value) return;
+
+  const editorInstance = editor.value;
+  searchText.value = "";
+  searchRange = null;
+
+  // 清除所有标记
+  const markers = editorInstance.session.getMarkers();
+  if (markers) {
+    Object.keys(markers).forEach((markerId) => {
+      editorInstance.session.removeMarker(Number(markerId));
+    });
+  }
+
+  editorInstance.clearSelection();
+  editorInstance.$search.set({
+    needle: "",
+  });
+};
+
+// 监听搜索文本变化
+watch(searchText, (newValue) => {
+  if (newValue) {
+    findNext();
+  } else {
+    clearSearch();
+  }
+});
 </script>
 
 <style lang="scss" scoped>
@@ -228,5 +387,109 @@ const copyContent = async () => {
   width: 100%;
   height: 100%;
   font-family: monospace;
+}
+
+.search-bar {
+  display: flex;
+  padding: 8px 16px;
+  border-bottom: 1px solid var(--color-border);
+  background: var(--color-bg);
+}
+
+.search-input-wrapper {
+  position: relative;
+  display: flex;
+  align-items: center;
+  width: 100%;
+  gap: 8px;
+
+  .iconfont {
+    position: absolute;
+    color: var(--color-text-light);
+    font-size: 14px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+
+    &.icon-search {
+      left: 0;
+      pointer-events: none;
+    }
+  }
+
+  input {
+    flex: 1;
+    height: 32px;
+    padding: 0 8px 0 32px;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    font-size: 14px;
+    outline: none;
+    transition: all 0.2s;
+
+    &:focus {
+      border-color: var(--color-primary);
+      box-shadow: 0 0 0 2px var(--color-primary-light);
+    }
+
+    &::placeholder {
+      color: var(--color-text-light);
+    }
+  }
+}
+
+.search-actions {
+  display: flex;
+  gap: 4px;
+  margin-left: auto;
+
+  .search-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 32px;
+    height: 32px;
+    padding: 0;
+    border: 1px solid var(--color-border);
+    border-radius: 4px;
+    background: var(--color-surface);
+    color: var(--color-text);
+    cursor: pointer;
+    transition: all 0.2s;
+
+    &:hover:not(:disabled) {
+      border-color: var(--color-primary);
+      color: var(--color-primary);
+    }
+
+    &:active:not(:disabled) {
+      background: var(--color-primary-light);
+    }
+
+    &:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .iconfont {
+      font-size: 14px;
+    }
+  }
+}
+
+// 修改高亮样式
+:deep(.ace_selected-word) {
+  border: none;
+  background: var(--color-primary-light);
+  opacity: 1;
+}
+
+:deep(.ace_selected) {
+  background: var(--color-primary) !important;
+  opacity: 1;
 }
 </style>
