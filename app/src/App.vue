@@ -55,21 +55,6 @@
             </template>
           </div>
         </div>
-
-        <!-- 添加主题切换按钮 -->
-        <div class="header-right">
-          <button class="theme-toggle" @click="toggleTheme">
-            <div class="theme-toggle-icon">
-              <i
-                :class="[
-                  currentTheme === 'light' ? 'icon-yueliang' : 'icon-taiyang',
-                  'animate-spin',
-                ]"
-                class="iconfont"
-              />
-            </div>
-          </button>
-        </div>
       </div>
       <div class="content">
         <keep-alive>
@@ -108,11 +93,6 @@ const navigateTo = (route: string): void => {
 
 // 使用 Vuex 状态
 const currentTheme = computed((): Theme => store.getters["theme/currentTheme"]);
-
-// 切换主题
-const toggleTheme = (): void => {
-  store.dispatch("theme/toggleTheme");
-};
 
 // 初始化主题
 store.dispatch("theme/applyTheme");

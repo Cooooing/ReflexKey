@@ -1,55 +1,29 @@
 <template>
-  <div class="page-navigation">
-    <template v-for="(crumb, index) in items" :key="index">
-      <span
-        :class="{ clickable: crumb.path && index < items.length - 1 }"
-        @click="handleClick(crumb)"
+  <nav class="app-breadcrumb">
+    <ol class="app-breadcrumb__list">
+      <li
+        v-for="(item, index) in items"
+        :key="index"
+        class="app-breadcrumb__item"
       >
-        {{ crumb.text }}
-      </span>
-      <span v-if="index < items.length - 1" class="separator">/</span>
-    </template>
-  </div>
+        <router-link
+          v-if="item.path"
+          :to="item.path"
+          class="app-breadcrumb__link"
+        >
+          {{ item.name }}
+        </router-link>
+        <span v-else class="app-breadcrumb__text">{{ item.name }}</span>
+      </li>
+    </ol>
+  </nav>
 </template>
 
 <script setup lang="ts">
-import { useRouter } from "vue-router";
-import type { BreadcrumbItem } from "@/types/common";
-
 defineProps<{
-  items: BreadcrumbItem[];
+  items: Array<{
+    name: string;
+    path?: string;
+  }>;
 }>();
-
-const router = useRouter();
-
-const handleClick = (crumb: BreadcrumbItem): void => {
-  if (crumb.path) {
-    router.push(crumb.path);
-  }
-};
 </script>
-
-<style scoped>
-.page-navigation {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  font-size: 14px;
-  color: var(--color-text-secondary);
-}
-
-.separator {
-  color: var(--color-text-secondary);
-}
-
-.clickable {
-  color: var(--color-primary);
-  cursor: pointer;
-  transition: opacity 0.2s;
-}
-
-.clickable:hover {
-  opacity: 0.8;
-  text-decoration: underline;
-}
-</style>

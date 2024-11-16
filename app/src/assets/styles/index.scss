@@ -1,3 +1,16 @@
-@import './common/variables';
-@import './common/transitions';
-@import './common/layout'; 
+@import './base/reset';
+@import './base/typography';
+@import './base/naming';
+@import './base/animations';
+@import './base/breakpoints';
+
+@import './themes/variables';
+@import './themes/light';
+@import './themes/dark';
+
+@import './components/button';
+@import './components/card';
+@import './components/breadcrumb';
+
+@import './layout/header';
+@import './layout/main'; 

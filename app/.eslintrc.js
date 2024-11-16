@@ -2,6 +2,7 @@ module.exports = {
   root: true,
   env: {
     node: true,
+    "vue/setup-compiler-macros": true,
   },
   extends: [
     "plugin:vue/vue3-essential",
@@ -30,5 +31,6 @@ module.exports = {
     "@typescript-eslint/explicit-module-boundary-types": "warn",
     "prettier/prettier": "error",
     "vue/multi-word-component-names": "off",
+    "vue/no-setup-props-destructure": "off",
   },
 };

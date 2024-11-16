@@ -11,4 +11,13 @@ declare module "@fluentui/web-components" {
   export function provideFluentDesignSystem(): {
     register: (components: any[]) => void;
   };
+
+  export interface FluentNotification extends HTMLElement {
+    appearance: string;
+  }
+
+  export const fluentNotification: () => void;
+  export const provideFluentDesignSystem: () => {
+    register: (...components: any[]) => void;
+  };
 }
