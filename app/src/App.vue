@@ -86,22 +86,18 @@ import { useRoute, useRouter } from "vue-router";
 import { useStore } from "vuex";
 import type { Theme } from "@/types/theme";
 import "@/assets/icons/iconfont.css";
+import { NAV_ITEMS, SETTINGS_NAV } from "@/constants/nav";
 
 const store = useStore();
 const router = useRouter();
 const route = useRoute();
 
-const navItems = [
-  { name: "home", icon: "icon-home", text: "主页" },
-  { name: "account", icon: "icon-user", text: "账号" },
-  { name: "tools", icon: "icon-code", text: "工具" },
-];
+const navItems = NAV_ITEMS;
 
 const currentRoute = computed(() => route.meta.root || route.name);
 
 const navigateTo = (route: string): void => {
   if (route && router.hasRoute(route)) {
-    // 添加路由存在检查
     router.push({ name: route }).catch((err) => {
       console.error("Navigation failed:", err);
     });
@@ -138,7 +134,9 @@ const breadcrumbs = computed(() => {
   const rootName = route.meta.root || route.name;
 
   // 找到对应的导航项
-  const currentItem = navItems.find((item) => item.name === rootName);
+  const currentItem = [...navItems, SETTINGS_NAV].find(
+    (item) => item.name === rootName
+  );
   if (currentItem) {
     crumbs.push({
       text: currentItem.text,

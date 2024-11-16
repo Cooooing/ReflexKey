@@ -1,34 +1,56 @@
 <template>
   <div class="page-container">
-    <ModuleSection icon="icon-home" title="概览">
-      <div class="overview-grid">
-        <OverviewCard
-          v-for="item in overviewItems"
-          :key="item.title"
-          :icon="item.icon"
-          :title="item.title"
-          :value="item.value"
-        />
+    <!-- 概览模块 -->
+    <div class="module-section">
+      <div class="section-header">
+        <i class="iconfont icon-home" />
+        <h2 class="section-title">概览</h2>
       </div>
-    </ModuleSection>
+      <div class="section-content">
+        <div class="overview-grid">
+          <OverviewCard
+            v-for="item in overviewItems"
+            :key="item.title"
+            :icon="item.icon"
+            :title="item.title"
+            :value="item.value"
+          />
+        </div>
+      </div>
+    </div>
 
-    <ModuleSection icon="icon-history" title="最近使用">
-      <div class="recent-list">
-        <!-- 最近使用的内容 -->
+    <!-- 最近使用模块 -->
+    <div class="module-section">
+      <div class="section-header">
+        <i class="iconfont icon-history" />
+        <h2 class="section-title">最近使用</h2>
       </div>
-    </ModuleSection>
+      <div class="section-content">
+        <div class="recent-list">
+          <!-- 最近使用的内容 -->
+        </div>
+      </div>
+    </div>
 
-    <ModuleSection icon="icon-lightning" title="快速入口">
-      <div class="quick-access-grid">
-        <QuickAccessCard
-          v-for="item in quickAccessItems"
-          :key="item.name"
-          :icon="item.icon"
-          :name="item.name"
-          @click="item.onClick"
-        />
+    <!-- 快速入口模块 -->
+    <div class="module-section">
+      <div class="section-header">
+        <i class="iconfont icon-lightning" />
+        <h2 class="section-title">快速入口</h2>
       </div>
-    </ModuleSection>
+      <div class="section-content">
+        <div class="quick-access-grid">
+          <QuickAccessCard
+            v-for="item in quickAccessItems"
+            :key="item.name"
+            :icon="item.icon"
+            :name="item.name"
+            :description="item.description"
+            @click="item.onClick"
+          />
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -36,7 +58,6 @@
 import { ref } from "vue";
 import { useRouter } from "vue-router";
 import type { OverviewItem } from "@/types";
-import ModuleSection from "@/components/ModuleSection.vue";
 import OverviewCard from "@/components/OverviewCard.vue";
 import QuickAccessCard from "@/components/QuickAccessCard.vue";
 
@@ -51,26 +72,66 @@ const quickAccessItems = [
   {
     name: "添加账号",
     icon: "icon-add",
+    description: "添加新的账号信息",
     onClick: () => router.push({ name: "account" }),
   },
   {
     name: "常用工具",
     icon: "icon-tool",
+    description: "查看所有可用工具",
     onClick: () => router.push({ name: "tools" }),
   },
 ];
 </script>
 
 <style scoped>
+.page-container {
+  padding: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.module-section {
+  background: var(--color-surface);
+  border-radius: 8px;
+  padding: 16px;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  gap: 6px;
+  margin-bottom: 16px;
+}
+
+.section-header .iconfont {
+  font-size: 16px;
+  color: var(--color-primary);
+}
+
+.section-title {
+  font-size: 14px;
+  font-weight: 500;
+  color: var(--color-text);
+  margin: 0;
+}
+
 .overview-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
   gap: 16px;
 }
 
 .quick-access-grid {
   display: grid;
-  grid-template-columns: repeat(auto-fill, minmax(120px, 1fr));
+  grid-template-columns: repeat(auto-fill, minmax(240px, 1fr));
+  gap: 16px;
+}
+
+.recent-list {
+  display: grid;
   gap: 16px;
 }
 </style>
