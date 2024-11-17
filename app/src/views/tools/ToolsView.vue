@@ -113,6 +113,14 @@ const devTools: Tool[] = [
     route: "json-formatter",
     section: "dev",
   },
+  {
+    id: 3,
+    name: "AES 加解密",
+    description: "AES 加密与解密工具",
+    icon: "icon-lock",
+    route: "AES",
+    section: "dev",
+  },
 ];
 
 const handleToolClick = (tool: Tool) => {

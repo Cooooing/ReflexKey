@@ -32,15 +32,20 @@ func ServeAPI(ginServer *gin.Engine) {
 	{
 		system := api.Group("/system")
 		{
-			system.Handle("GET", "/ping", ping)
-			system.Handle("GET", "/databaseVersion", databaseVersion)
-			system.Handle("GET", "/db", db)
-			system.Handle("GET", "/err", err)
+			system.GET("/ping", ping)
+			system.GET("/databaseVersion", databaseVersion)
+			system.GET("/db", db)
+			system.GET("/err", err)
 		}
 		encoding := api.Group("/encoding")
 		{
-			encoding.Handle("GET", "/base64Encode", base64Encode)
-			encoding.Handle("GET", "/base64Decode", base64Decode)
+			encoding.GET("/base64Encode", base64Encode)
+			encoding.GET("/base64Decode", base64Decode)
+		}
+		crypto := api.Group("/crypto")
+		{
+			crypto.POST("/aesEncrypt", AesEncrypt)
+			crypto.POST("/aesDecrypt", AesDecrypt)
 		}
 	}
 

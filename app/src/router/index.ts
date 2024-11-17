@@ -51,6 +51,19 @@ const routes: AppRouteRecordRaw[] = [
           section: "dev",
         },
       },
+      {
+        path: "AES",
+        name: "AES",
+        component: () => import("../views/tools/AESCrypto.vue"),
+        meta: {
+          root: "tools",
+          breadcrumb: "工具",
+          moduleTitle: "开发工具",
+          subPage: "AES 加解密",
+          parentPath: "/tools",
+          section: "dev",
+        },
+      },
     ],
   },
   {

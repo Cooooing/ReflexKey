@@ -58,10 +58,6 @@ func AesEncrypt(params param.AesEncryptParam) (string, error) {
 		return "", errors.New("plainText can not be empty")
 	}
 
-	if !slices.Contains(aesType["PlainTextFormat"], params.PlainTextFormat) {
-		return "", errors.New("invalid plaintext format")
-	}
-
 	var plainTextBytes []byte
 	switch params.PlainTextFormat {
 	case "Hex":

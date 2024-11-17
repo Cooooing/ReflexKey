@@ -21,3 +21,28 @@ export interface BaseResponse<T> {
   message: string;
   success: boolean;
 }
+
+// 加密参数接口
+export interface AesEncryptParams {
+  plainText: string; // 明文
+  plainTextFormat: string; // 明文格式
+  operationMode: string; // 加密模式
+  fill: string; // 填充模式
+  key: string; // 密钥
+  keyFormat: string; // 密钥格式
+  deviation: string; // 偏移量
+  deviationFormat: string; // 偏移量格式
+  cipherTextFormat: string; // 密文输出格式
+}
+
+export interface AesDecryptParams {
+  cipherText: string; // 密文
+  cipherTextFormat: string; // 密文格式
+  operationMode: string; // 解密模式
+  fill: string; // 填充模式
+  key: string; // 密钥
+  keyFormat: string; // 密钥格式
+  deviation: string; // 偏移量
+  deviationFormat: string; // 偏移量格式
+  plainTextFormat: string; // 明文格式
+}
