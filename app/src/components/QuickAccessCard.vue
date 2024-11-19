@@ -11,7 +11,7 @@
 </template>
 
 <script lang="ts" setup>
-import { defineProps } from "vue";
+import {  } from "vue";
 
 defineProps<{
   icon: string;

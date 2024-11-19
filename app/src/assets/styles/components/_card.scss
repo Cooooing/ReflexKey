@@ -1,4 +1,4 @@
-@import '../base/naming';
+@use '../base/naming' as *;
 
 @include b(card) {
   display: flex;

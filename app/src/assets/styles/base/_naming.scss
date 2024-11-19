@@ -1,20 +1,22 @@
 /* BEM 命名规范 */
-$namespace: 'app';  // 项目命名空间
+@use 'sass:string';
 
-@mixin b($block) {
+$namespace: 'app';
+
+@mixin block($block) {
   .#{$namespace}-#{$block} {
     @content;
   }
 }
 
-@mixin e($element) {
+@mixin element($element) {
   &__#{$element} {
     @content;
   }
 }
 
-@mixin m($modifier) {
+@mixin modifier($modifier) {
   &--#{$modifier} {
     @content;
   }
-} 
+}

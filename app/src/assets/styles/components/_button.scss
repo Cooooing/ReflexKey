@@ -1,4 +1,4 @@
-@import '../base/naming';
+@use '../base/naming' as *;
 
 @include b(button) {
   display: inline-flex;
@@ -12,17 +12,12 @@
   cursor: pointer;
   border: none;
   
-  // 主要按钮
   @include m(primary) {
     background: var(--color-primary);
     color: white;
     
     &:hover {
       opacity: 0.9;
-    }
-
-    &:active {
-      transform: translateY(1px);
     }
   }
 

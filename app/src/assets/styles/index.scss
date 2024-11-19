@@ -1,16 +1,16 @@
-@import './base/reset';
-@import './base/typography';
-@import './base/naming';
-@import './base/animations';
-@import './base/breakpoints';
+@use './base/reset';
+@use './base/typography';
+@use './base/naming';
+@use './base/animations';
+@use './base/breakpoints';
 
-@import './themes/variables';
-@import './themes/light';
-@import './themes/dark';
+@use './themes/variables';
+@use './themes/light';
+@use './themes/dark';
 
-@import './components/button';
-@import './components/card';
-@import './components/breadcrumb';
+@use './components/button';
+@use './components/card';
+@use './components/breadcrumb';
 
-@import './layout/header';
-@import './layout/main'; 
+@use './layout/header';
+@use './layout/main';
