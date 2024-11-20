@@ -1,32 +1,19 @@
 package api
 
 import (
+	"embed"
+	"fmt"
 	"github.com/gin-gonic/gin"
 	"kernel/conf"
 	"net/http"
 	"net/http/pprof"
-	"path"
-	"path/filepath"
+	"strings"
 )
 
+//go:embed static/*
+var frontend embed.FS
+
 func ServeAPI(ginServer *gin.Engine) {
-
-	ginServer.NoRoute(notFound)
-	ginServer.NoRoute(notFound)
-
-	ginServer.GET("/assets/*path", func(c *gin.Context) {
-		requestPath := c.Param("path")
-		relativePath := path.Join("assets", requestPath)
-		p := filepath.Join(conf.DataDir, relativePath)
-		http.ServeFile(c.Writer, c.Request, p)
-		return
-	})
-
-	ginServer.StaticFile("/", "./workspace/data/index.html")
-	ginServer.StaticFile("/index.html", "./workspace/data/index.html")
-
-	ginServer.StaticFS("/more", http.Dir("./workspace"))
-	ginServer.StaticFile("/favicon.ico", "./workspace/data/resources/icon.png")
 
 	api := ginServer.Group("/api")
 	{
@@ -48,6 +35,38 @@ func ServeAPI(ginServer *gin.Engine) {
 			crypto.POST("/aesDecrypt", AesDecrypt)
 		}
 	}
+
+	ginServer.Any("/static/*filepath", func(c *gin.Context) {
+		staticServer := http.FileServer(http.FS(frontend))
+		staticServer.ServeHTTP(c.Writer, c.Request)
+	})
+
+	// 加载前端的 index.html
+	ginServer.GET("/", func(c *gin.Context) {
+		file, err := frontend.ReadFile("static/index.html")
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Error loading index.html")
+			return
+		}
+		c.Data(http.StatusOK, "text/html; charset=utf-8", file)
+	})
+
+	// 捕获所有未匹配路由，返回 index.html（支持前端路由）
+	ginServer.NoRoute(func(c *gin.Context) {
+		path := c.Request.URL.Path
+		fmt.Println(path)
+		if strings.HasPrefix(path, "/api/") {
+			notFound(c)
+			return
+		}
+
+		file, err := frontend.ReadFile("static/index.html")
+		if err != nil {
+			c.String(http.StatusInternalServerError, "Error loading index.html")
+			return
+		}
+		c.Data(http.StatusOK, "text/html; charset=utf-8", file)
+	})
 
 	// serveDebug 生产模式下关闭 pprof
 	if conf.Prod == conf.Mode {

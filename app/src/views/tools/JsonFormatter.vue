@@ -81,7 +81,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, computed, watch, onMounted } from "vue";
+import { computed, onMounted, ref, watch } from "vue";
 import { VAceEditor } from "vue3-ace-editor";
 import { useStore } from "vuex";
 import "ace-builds/src-noconflict/mode-json";
@@ -252,7 +252,7 @@ const findNext = () => {
     const doc = editorInstance.session.getDocument();
     const lines = doc.getAllLines();
 
-    lines.forEach((line, row) => {
+    lines.forEach((line: string, row: number) => {
       let match;
       const searchRegex = new RegExp(searchText.value, "gi");
 
@@ -261,13 +261,13 @@ const findNext = () => {
           row,
           match.index,
           row,
-          match.index + match[0].length
+          match.index + match[0].length,
         );
         editorInstance.session.addMarker(
           range,
           "ace_selected-word",
           "text",
-          false
+          false,
         );
       }
     });
