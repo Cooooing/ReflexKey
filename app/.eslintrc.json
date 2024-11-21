@@ -9,7 +9,7 @@
     "eslint:recommended",
     "@vue/eslint-config-typescript",
     "plugin:@typescript-eslint/recommended",
-    "plugin:prettier/recommended"
+    "./.eslintrc-auto-import.json"
   ],
   "parserOptions": {
     "ecmaVersion": 2020,
@@ -33,7 +33,6 @@
     "no-unused-vars": "warn",
     "@typescript-eslint/no-explicit-any": "warn",
     "@typescript-eslint/explicit-module-boundary-types": "warn",
-    "prettier/prettier": "error",
     "vue/multi-word-component-names": "off",
     "vue/no-setup-props-destructure": "off"
   }

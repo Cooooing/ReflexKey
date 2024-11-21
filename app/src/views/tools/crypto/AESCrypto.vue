@@ -511,8 +511,8 @@ input {
 
 <script lang="ts" setup>
 import { reactive, ref, watch } from "vue";
-import { aesEncrypt, aesDecrypt } from "@/api/crypto";
-import type { AesEncryptParams, AesDecryptParams } from "@/api/types";
+import { aesDecrypt, aesEncrypt } from "@/api/crypto";
+import type { AesDecryptParams, AesEncryptParams } from "@/api/types";
 import { Message } from "@/components/Message"; // 修改为正确的 Message 组件导入
 
 // 配置选项
@@ -651,7 +651,7 @@ watch(
     if (newMode === "ECB") {
       formState.deviation = "";
     }
-  }
+  },
 );
 
 // 清空表单

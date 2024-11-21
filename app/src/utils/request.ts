@@ -1,13 +1,13 @@
-import axios from "axios";
 import type {
   AxiosInstance,
-  InternalAxiosRequestConfig,
   AxiosResponse,
+  InternalAxiosRequestConfig,
 } from "axios";
+import axios from "axios";
 
 // 创建 axios 实例
 const http: AxiosInstance = axios.create({
-  baseURL: process.env.VUE_APP_API_BASE_URL || "http://127.0.0.1:25566",
+  baseURL: import.meta.env.VITE_API_BASE_URL || "http://127.0.0.1:25566",
   timeout: 15000,
   headers: {
     "Content-Type": "application/json",
@@ -23,7 +23,7 @@ http.interceptors.request.use(
   },
   (error) => {
     return Promise.reject(error);
-  }
+  },
 );
 
 // 响应拦截器
@@ -48,8 +48,7 @@ http.interceptors.response.use(
     // 如果是后端返回的错误，使用后端的错误信息
     const message = error.response?.data?.msg;
     return Promise.reject(new Error(message));
-  }
+  },
 );
 
 export { http };
-export default http;

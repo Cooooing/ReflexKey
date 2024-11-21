@@ -54,7 +54,7 @@ const routes: AppRouteRecordRaw[] = [
       {
         path: "AES",
         name: "AES",
-        component: () => import("../views/tools/AESCrypto.vue"),
+        component: () => import("../views/tools/crypto/AESCrypto.vue"),
         meta: {
           root: "tools",
           breadcrumb: "工具",

@@ -1,6 +1,5 @@
 import { http } from "@/utils/request";
-import type { AesEncryptParams, AesDecryptParams } from "./types";
-import type { BaseResponse } from "./types";
+import type { AesDecryptParams, AesEncryptParams } from "./types";
 
 export const aesEncrypt = (data: AesEncryptParams) => {
   return http.post<string>("/api/crypto/aesEncrypt", data);
