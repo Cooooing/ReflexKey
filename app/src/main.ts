@@ -1,12 +1,12 @@
-import { createApp } from "vue";
-import App from "./App.vue";
-import router from "./router";
-import store from "./store";
-import Message from "@/components/Message";
-import "./main.css";
+import { createApp } from 'vue'
+import App from './App.vue'
+import naive from 'naive-ui'
 
-const app = createApp(App);
-app.use(store);
-app.use(router);
-app.use(Message);
-app.mount("#app");
+async function setupApp() {
+  const app = createApp(App)
+
+  app.use(naive)
+  app.mount('#app')
+}
+
+void setupApp()
