@@ -7,6 +7,7 @@ import (
 	"kernel/conf"
 	"kernel/model"
 	"net/http"
+	"strings"
 	"time"
 )
 
@@ -58,5 +59,18 @@ func CorsMiddleware(c *gin.Context) {
 		return
 	}
 
+	c.Next()
+}
+
+// Authorize 鉴权
+func Authorize(c *gin.Context) {
+	path := c.Request.URL.Path
+	if (conf.Conf.NetworkServe || conf.Conf.Authorize) && (!strings.HasPrefix(path, "/api/auth") && strings.HasPrefix(path, "/api")) {
+		authorization := c.GetHeader("Authorization")
+		if authorization == "" {
+			model.Forbidden(c)
+			return
+		}
+	}
 	c.Next()
 }

@@ -7,20 +7,12 @@ export {}
 /* prettier-ignore */
 declare module 'vue' {
   export interface GlobalComponents {
-    AppLoading: typeof import('./src/components/common/app-loading.vue')['default']
-    BetterScroll: typeof import('./src/components/custom/better-scroll.vue')['default']
-    DarkModeContainer: typeof import('./src/components/common/dark-mode-container.vue')['default']
-    DarkModeSwitch: typeof import('./src/components/common/dark-mode-switch.vue')['default']
     ExceptionBase: typeof import('./src/components/common/exception-base.vue')['default']
-    HoverContainer: typeof import('./src/components/common/hover-container.vue')['default']
-    LoadingEmptyWrapper: typeof import('./src/components/business/loading-empty-wrapper.vue')['default']
-    LoginAgreement: typeof import('./src/components/business/login-agreement.vue')['default']
     NaiveProvider: typeof import('./src/components/common/naive-provider.vue')['default']
     NAlert: typeof import('naive-ui')['NAlert']
     NAvatar: typeof import('naive-ui')['NAvatar']
     NBadge: typeof import('naive-ui')['NBadge']
     NButton: typeof import('naive-ui')['NButton']
-    NCard: typeof import('naive-ui')['NCard']
     NCheckbox: typeof import('naive-ui')['NCheckbox']
     NCheckboxGroup: typeof import('naive-ui')['NCheckboxGroup']
     NCol: typeof import('naive-ui')['NCol']
@@ -32,7 +24,6 @@ declare module 'vue' {
     NElement: typeof import('naive-ui')['NElement']
     NForm: typeof import('naive-ui')['NForm']
     NFormItem: typeof import('naive-ui')['NFormItem']
-    NIcon: typeof import('naive-ui')['NIcon']
     NLayout: typeof import('naive-ui')['NLayout']
     NLayoutContent: typeof import('naive-ui')['NLayoutContent']
     NLayoutHeader: typeof import('naive-ui')['NLayoutHeader']
@@ -54,7 +45,5 @@ declare module 'vue' {
     NTooltip: typeof import('naive-ui')['NTooltip']
     RouterLink: typeof import('vue-router')['RouterLink']
     RouterView: typeof import('vue-router')['RouterView']
-    SvgIcon: typeof import('./src/components/custom/svg-icon.vue')['default']
-    SystemLogo: typeof import('./src/components/common/system-logo.vue')['default']
   }
 }

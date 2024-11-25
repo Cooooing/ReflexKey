@@ -14,7 +14,15 @@ create table if not exists `configs`
 );
 
 insert into configs (env, device, type, only_read, key, value, created_at, updated_at, deleted_at)
-select 'all', 'all', 'system', 1, 'reflex_key_database_ver', '20240930', datetime('now'), datetime('now'), null
+select 'all'
+     , 'all'
+     , 'system'
+     , 1
+     , 'reflex_key_database_ver'
+     , '20240930'
+     , datetime('now')
+     , datetime('now')
+     , null
 where not exists(select 1 from configs where key = 'reflex_key_database_ver');
 
 --  账号密码表 account

@@ -1,0 +1,8 @@
+{
+	"dependencies": {
+		"@types/node": "^22.9.3"
+	},
+	"devDependencies": {
+		"@types/lodash-es": "^4.17.12"
+	}
+}

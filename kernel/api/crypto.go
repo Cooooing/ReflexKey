@@ -8,19 +8,10 @@ import (
 	"net/http"
 )
 
-// AesEncrypt AES加密
-// @Summary AES加密
-// @Description 使用AES算法加密数据
-// @Tags 加密解密
-// @Accept json
-// @Produce json
-// @Param params body param.AesEncryptParam true "加密参数"
-// @Success 200 {object} result.Result "加密成功"
-// @Router /api/crypto/aes/encrypt [post]
 func AesEncrypt(c *gin.Context) {
 	var params param.AesEncryptParam
 	if err := c.ShouldBindJSON(&params); err != nil {
-		c.JSON(http.StatusBadRequest, model.BadRequest())
+		model.BadRequest(c)
 		return
 	}
 
@@ -33,19 +24,10 @@ func AesEncrypt(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success(cipherText))
 }
 
-// AesDecrypt AES解密
-// @Summary AES解密
-// @Description 使用AES算法解密数据
-// @Tags 加密解密
-// @Accept json
-// @Produce json
-// @Param params body param.AesDecryptParam true "解密参数"
-// @Success 200 {object} result.Result "解密成功"
-// @Router /api/crypto/aes/decrypt [post]
 func AesDecrypt(c *gin.Context) {
 	var params param.AesDecryptParam
 	if err := c.ShouldBindJSON(&params); err != nil {
-		c.JSON(http.StatusBadRequest, model.BadRequest())
+		model.BadRequest(c)
 		return
 	}
 
@@ -56,4 +38,49 @@ func AesDecrypt(c *gin.Context) {
 	}
 
 	c.JSON(http.StatusOK, model.Success(plainText))
+}
+
+func BcryptHash(c *gin.Context) {
+	var params param.BcryptHashParam
+	if err := c.ShouldBindJSON(&params); err != nil {
+		model.BadRequest(c)
+		return
+	}
+
+	hashedPassword, err := util.BcryptHash([]byte(params.Password), params.Cost)
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, model.Fail(err.Error()))
+		return
+	}
+
+	c.JSON(http.StatusOK, model.Success(hashedPassword))
+}
+
+func BcryptCompare(c *gin.Context) {
+	var params param.BcryptCompareParam
+	if err := c.ShouldBindJSON(&params); err != nil {
+		model.BadRequest(c)
+		return
+	}
+
+	err := util.BcryptCompare([]byte(params.HashedPassword), []byte(params.Password))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, model.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, model.Success("crypto/bcrypt: hashedPassword is the hash of the given password"))
+}
+
+func BcryptCost(c *gin.Context) {
+	var params param.BcryptCostParam
+	if err := c.ShouldBindJSON(&params); err != nil {
+		model.BadRequest(c)
+		return
+	}
+	cost, err := util.BcryptCost([]byte(params.HashedPassword))
+	if err != nil {
+		c.JSON(http.StatusInternalServerError, model.Fail(err.Error()))
+		return
+	}
+	c.JSON(http.StatusOK, model.Success(cost))
 }

@@ -3,7 +3,6 @@ import { defineStore } from 'pinia'
 import { getGenerateColors, getThemeOverrides } from './helper'
 import { darkTheme } from 'naive-ui'
 import { type BasicColorSchema, useColorMode, useCycleList } from '@vueuse/core'
-import { NTheme } from '../../../vite-env'
 
 export const useThemeStore = defineStore('theme', () => {
   /** 默认模式，一般设置为auto跟随系统 */

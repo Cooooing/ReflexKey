@@ -18,6 +18,7 @@ type AppConf struct {
 	ReadOnly bool `json:"readonly"` // 是否是以只读模式运行
 
 	AccessAuthCode string `json:"accessAuthCode"` // 访问授权码
+	Authorize      bool   `json:"authorize"`      // 是否开启鉴权（开启网络伺服时默认开启）
 
 	NetworkServe bool          `json:"networkServe"` // 是否开启网络伺服
 	NetworkProxy *NetworkProxy `json:"networkProxy"` // 网络代理

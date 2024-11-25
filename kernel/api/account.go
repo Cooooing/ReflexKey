@@ -11,7 +11,7 @@ import (
 func addAccount(c *gin.Context) {
 	var account entity.Account
 	if err := c.ShouldBindJSON(&account); err != nil {
-		c.JSON(http.StatusBadRequest, model.BadRequest())
+		model.BadRequest(c)
 		return
 	}
 	result := sql.DB.Create(&account) // 通过数据的指针来创建

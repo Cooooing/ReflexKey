@@ -2,7 +2,6 @@ import { generate } from '@ant-design/colors'
 import { colord } from 'colord'
 import { kebabCase, upperFirst } from 'lodash-es'
 import { commonDark, commonLight, type GlobalThemeOverrides } from 'naive-ui'
-import { NTheme } from '../../../vite-env'
 
 type ColorKey = `${NTheme.ColorType}Color${NTheme.ColorSceneCase}`
 type ButtonColorKey =

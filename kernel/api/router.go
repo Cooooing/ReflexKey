@@ -22,15 +22,29 @@ func ServeAPI(ginServer *gin.Engine) {
 			system.GET("/db", db)
 			system.GET("/err", err)
 		}
-		encoding := api.Group("/encoding")
+		auth := api.Group("/auth")
 		{
-			encoding.GET("/base64Encode", base64Encode)
-			encoding.GET("/base64Decode", base64Decode)
+			auth.POST("/login", login)
 		}
-		crypto := api.Group("/crypto")
+		account := api.Group("/account")
 		{
-			crypto.POST("/aesEncrypt", AesEncrypt)
-			crypto.POST("/aesDecrypt", AesDecrypt)
+			account.POST("/addAccount", addAccount)
+		}
+		tools := api.Group("/tools")
+		{
+			encoding := tools.Group("/encoding")
+			{
+				encoding.GET("/base64Encode", base64Encode)
+				encoding.GET("/base64Decode", base64Decode)
+			}
+			crypto := tools.Group("/crypto")
+			{
+				crypto.POST("/aesEncrypt", AesEncrypt)
+				crypto.POST("/aesDecrypt", AesDecrypt)
+				crypto.POST("/bcryptHash", BcryptHash)
+				crypto.POST("/bcryptCompare", BcryptCompare)
+				crypto.POST("/bcryptCost", BcryptCost)
+			}
 		}
 	}
 

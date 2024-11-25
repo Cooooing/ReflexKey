@@ -23,3 +23,17 @@ type AesDecryptParam struct {
 	DeviationFormat  string `json:"deviationFormat"`  // 偏移量格式
 	PlainTextFormat  string `json:"plainTextFormat"`  // 明文格式
 }
+
+type BcryptHashParam struct {
+	Password string `json:"password"` // 明文
+	Cost     int    `json:"cost"`     // 哈希成本
+}
+
+type BcryptCompareParam struct {
+	HashedPassword string `json:"hashedPassword"` // 密文
+	Password       string `json:"password"`       // 明文
+}
+
+type BcryptCostParam struct {
+	HashedPassword string `json:"hashedPassword"` // 密文
+}

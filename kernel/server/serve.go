@@ -29,6 +29,7 @@ func Start() {
 		middlewares.Logging,
 		middlewares.Recover,
 		middlewares.CorsMiddleware, // 后端服务支持 CORS 预检请求验证
+		middlewares.Authorize,
 	)
 
 	api.ServeAPI(ginServer)

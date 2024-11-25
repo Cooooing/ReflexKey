@@ -1,6 +1,10 @@
 package model
 
-import "time"
+import (
+	"github.com/gin-gonic/gin"
+	"net/http"
+	"time"
+)
 
 // Result represents a common-used result struct.
 type Result struct {
@@ -21,15 +25,26 @@ func Fail(msg string) *Result {
 func Success(data any) *Result {
 	return &Result{
 		Code: 200,
+		Msg:  "Success",
 		Data: data,
 		Time: time.Now().Format("2006-01-02 15:04:05"),
 	}
 }
 
-func BadRequest() *Result {
-	return &Result{
+func BadRequest(c *gin.Context) {
+	r := &Result{
 		Code: 400,
-		Data: "Bad Request",
+		Msg:  "Bad Request",
 		Time: time.Now().Format("2006-01-02 15:04:05"),
 	}
+	c.AbortWithStatusJSON(http.StatusBadRequest, r)
+}
+
+func Forbidden(c *gin.Context) {
+	r := &Result{
+		Code: 403,
+		Msg:  "Forbidden",
+		Time: time.Now().Format("2006-01-02 15:04:05"),
+	}
+	c.AbortWithStatusJSON(http.StatusForbidden, r)
 }
