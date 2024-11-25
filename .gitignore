@@ -6,6 +6,7 @@
 /app/.vscode/
 /app/node_modules/
 /app/out/
+/app/dist/
 
 
 # kernel

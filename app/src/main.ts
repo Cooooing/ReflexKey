@@ -1,11 +1,9 @@
 import { createApp } from 'vue'
 import App from './App.vue'
-import naive from 'naive-ui'
-
+import { setupStore } from './stores'
 async function setupApp() {
   const app = createApp(App)
-
-  app.use(naive)
+  setupStore(app)
   app.mount('#app')
 }
 
