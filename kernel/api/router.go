@@ -1,61 +1,32 @@
 package api
 
 import (
-	"embed"
 	"github.com/gin-gonic/gin"
+	"kernel/api/system"
+	"kernel/api/tool"
 	"kernel/conf"
 	"net/http/pprof"
 )
 
-//go:embed static/*
-var frontend embed.FS
-
 func ServeAPI(ginServer *gin.Engine) {
+
+	// 静态资源路由
+	systemController := system.NewSystemController()
+	systemController.InitRoutes(ginServer)
 
 	// api 路由
 	api := ginServer.Group("/api")
 	{
-		system := api.Group("/system")
+		systemGroup := api.Group("/system")
 		{
-			system.GET("/ping", ping)
-			system.GET("/databaseVersion", databaseVersion)
-			system.GET("/db", db)
-			system.GET("/err", err)
-		}
-		auth := api.Group("/auth")
-		{
-			auth.POST("/login", login)
-		}
-		account := api.Group("/account")
-		{
-			account.POST("/addAccount", addAccount)
+			systemController.Routes(systemGroup)
 		}
 		tools := api.Group("/tools")
 		{
-			encoding := tools.Group("/encoding")
-			{
-				encoding.GET("/base64Encode", base64Encode)
-				encoding.GET("/base64Decode", base64Decode)
-			}
-			crypto := tools.Group("/crypto")
-			{
-				crypto.POST("/aesEncrypt", AesEncrypt)
-				crypto.POST("/aesDecrypt", AesDecrypt)
-				crypto.POST("/bcryptHash", BcryptHash)
-				crypto.POST("/bcryptCompare", BcryptCompare)
-				crypto.POST("/bcryptCost", BcryptCost)
-			}
+			tool.NewEncodingController().Routes(tools.Group("/encoding"))
+			tool.NewCryptoController().Routes(tools.Group("/crypto"))
 		}
 	}
-
-	// 静态资源路由
-	ginServer.Any("/static/*filepath", static)
-
-	// 首页路由
-	ginServer.GET("/", index)
-
-	// 捕获所有未匹配路由，前端路由返回 index.html 后端路由（/api/*）返回 404
-	ginServer.NoRoute(noRoute)
 
 	// serveDebug 生产模式下关闭 pprof
 	if conf.Prod == conf.Mode {

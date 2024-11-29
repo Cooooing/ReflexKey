@@ -13,7 +13,7 @@
 /kernel/log/
 /kernel/workspace/
 /kernel/*.exe
-/kernel/api/static/
+/kernel/api/system/static/
 
 
 # release
