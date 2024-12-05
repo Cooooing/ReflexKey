@@ -15,11 +15,11 @@ var frontend embed.FS
 type SystemController struct {
 }
 
-func NewSystemController() SystemController {
-	return SystemController{}
+func NewSystemController() *SystemController {
+	return &SystemController{}
 }
 
-func (system SystemController) InitRoutes(ginServer *gin.Engine) {
+func (system *SystemController) InitRoutes(ginServer *gin.Engine) {
 	// 首页路由
 	ginServer.GET("/", system.index)
 	// 静态资源路由
@@ -28,17 +28,17 @@ func (system SystemController) InitRoutes(ginServer *gin.Engine) {
 	ginServer.NoRoute(system.noRoute)
 }
 
-func (system SystemController) Routes(rg *gin.RouterGroup) {
+func (system *SystemController) Routes(rg *gin.RouterGroup) {
 	rg.POST("/ping", system.ping)
 	rg.POST("/databaseVersion", system.databaseVersion)
 }
 
-func (system SystemController) static(c *gin.Context) {
+func (system *SystemController) static(c *gin.Context) {
 	staticServer := http.FileServer(http.FS(frontend))
 	staticServer.ServeHTTP(c.Writer, c.Request)
 }
 
-func (system SystemController) index(c *gin.Context) {
+func (system *SystemController) index(c *gin.Context) {
 	file, err := frontend.ReadFile("static/index.html")
 	if err != nil {
 		c.String(http.StatusInternalServerError, "Error loading index.html")
@@ -47,7 +47,7 @@ func (system SystemController) index(c *gin.Context) {
 	c.Data(http.StatusOK, "text/html; charset=utf-8", file)
 }
 
-func (system SystemController) noRoute(c *gin.Context) {
+func (system *SystemController) noRoute(c *gin.Context) {
 	path := c.Request.URL.Path
 	if strings.HasPrefix(path, "/api/") {
 		c.JSON(http.StatusNotFound, model.Fail("404 page not found"))
@@ -57,10 +57,10 @@ func (system SystemController) noRoute(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/")
 }
 
-func (system SystemController) ping(c *gin.Context) {
+func (system *SystemController) ping(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success("pong"))
 }
 
-func (system SystemController) databaseVersion(c *gin.Context) {
+func (system *SystemController) databaseVersion(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success(conf.DatabaseVersion))
 }

@@ -8,6 +8,7 @@ import (
 	"kernel/model"
 	"kernel/model/param"
 	"kernel/util"
+	"mime/multipart"
 	"net/http"
 	"strconv"
 )
@@ -15,18 +16,18 @@ import (
 type EncodingController struct {
 }
 
-func NewEncodingController() EncodingController {
-	return EncodingController{}
+func NewEncodingController() *EncodingController {
+	return &EncodingController{}
 }
 
-func (encoding EncodingController) Routes(rg *gin.RouterGroup) {
+func (encoding *EncodingController) Routes(rg *gin.RouterGroup) {
 	rg.POST("/base64Encode", encoding.base64Encode)
 	rg.POST("/base64Decode", encoding.base64Decode)
 	rg.POST("/base64EncodeImg", encoding.base64EncodeImg)
 	rg.POST("/base64DecodeImg", encoding.base64DecodeImg)
 }
 
-func (encoding EncodingController) base64Encode(c *gin.Context) {
+func (encoding *EncodingController) base64Encode(c *gin.Context) {
 	var params model.Tuple[string]
 	if err := c.ShouldBindJSON(&params); err != nil {
 		common.Log.Error("base64Encode params error:", err)
@@ -37,7 +38,7 @@ func (encoding EncodingController) base64Encode(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success(res))
 }
 
-func (encoding EncodingController) base64Decode(c *gin.Context) {
+func (encoding *EncodingController) base64Decode(c *gin.Context) {
 	var params model.Tuple[string]
 	if err := c.ShouldBindJSON(&params); err != nil {
 		common.Log.Error("base64Decode params error:", err)
@@ -52,7 +53,7 @@ func (encoding EncodingController) base64Decode(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success(res))
 }
 
-func (encoding EncodingController) base64EncodeImg(c *gin.Context) {
+func (encoding *EncodingController) base64EncodeImg(c *gin.Context) {
 	//file, err := c.FormFile("data")
 	var params param.Base64EncodeParam
 	err := c.ShouldBind(&params)
@@ -63,7 +64,12 @@ func (encoding EncodingController) base64EncodeImg(c *gin.Context) {
 		return
 	}
 	fileRead, err := params.File.Open()
-	defer fileRead.Close()
+	defer func(fileRead multipart.File) {
+		err := fileRead.Close()
+		if err != nil {
+			common.Log.Error("base64EncodeImg close file error:", err)
+		}
+	}(fileRead)
 	bytes, err := io.ReadAll(fileRead)
 	data := util.Base64Encode(bytes)
 	if err != nil {
@@ -73,7 +79,7 @@ func (encoding EncodingController) base64EncodeImg(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success(data))
 }
 
-func (encoding EncodingController) base64DecodeImg(c *gin.Context) {
+func (encoding *EncodingController) base64DecodeImg(c *gin.Context) {
 	var params model.Tuple[string]
 	if err := c.ShouldBindJSON(&params); err != nil {
 		common.Log.Error("base64Decode params error:", err)
