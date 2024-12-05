@@ -12,11 +12,11 @@ import (
 type CryptoController struct {
 }
 
-func NewCryptoController() CryptoController {
-	return CryptoController{}
+func NewCryptoController() *CryptoController {
+	return &CryptoController{}
 }
 
-func (crypto CryptoController) Routes(rg *gin.RouterGroup) {
+func (crypto *CryptoController) Routes(rg *gin.RouterGroup) {
 	rg.POST("/aesEncrypt", crypto.aesEncrypt)
 	rg.POST("/aesDecrypt", crypto.aesDecrypt)
 	rg.POST("/bcryptHash", crypto.bcryptHash)
@@ -24,7 +24,7 @@ func (crypto CryptoController) Routes(rg *gin.RouterGroup) {
 	rg.POST("/bcryptCost", crypto.bcryptCost)
 }
 
-func (crypto CryptoController) aesEncrypt(c *gin.Context) {
+func (crypto *CryptoController) aesEncrypt(c *gin.Context) {
 	var (
 		params param.AesEncryptParam
 		result string
@@ -47,7 +47,7 @@ func (crypto CryptoController) aesEncrypt(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success(result))
 }
 
-func (crypto CryptoController) aesDecrypt(c *gin.Context) {
+func (crypto *CryptoController) aesDecrypt(c *gin.Context) {
 	var (
 		params param.AesDecryptParam
 		result string
@@ -70,7 +70,7 @@ func (crypto CryptoController) aesDecrypt(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success(result))
 }
 
-func (crypto CryptoController) bcryptHash(c *gin.Context) {
+func (crypto *CryptoController) bcryptHash(c *gin.Context) {
 	var (
 		params param.BcryptHashParam
 		result string
@@ -93,7 +93,7 @@ func (crypto CryptoController) bcryptHash(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success(result))
 }
 
-func (crypto CryptoController) bcryptCompare(c *gin.Context) {
+func (crypto *CryptoController) bcryptCompare(c *gin.Context) {
 	var (
 		params param.BcryptCompareParam
 		result string
@@ -116,7 +116,7 @@ func (crypto CryptoController) bcryptCompare(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success(result))
 }
 
-func (crypto CryptoController) bcryptCost(c *gin.Context) {
+func (crypto *CryptoController) bcryptCost(c *gin.Context) {
 	var (
 		params param.BcryptCostParam
 		result int
