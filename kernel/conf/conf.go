@@ -20,6 +20,11 @@ type AppConf struct {
 	AccessAuthCode string `json:"accessAuthCode"` // 访问授权码
 	Authorize      bool   `json:"authorize"`      // 是否开启鉴权（开启网络伺服时默认开启）
 
+	SSL             bool     `json:"ssl"` // 是否开启 HTTPS
+	CertFileName    string   `json:"certFileName"`
+	CertKeyFileName string   `json:"certKeyFileName"`
+	CertDNSNames    []string `json:"certDNSNames"`
+
 	NetworkServe bool          `json:"networkServe"` // 是否开启网络伺服
 	NetworkProxy *NetworkProxy `json:"networkProxy"` // 网络代理
 
@@ -44,7 +49,7 @@ func InitConf() {
 			}
 		}
 	}
-
+	Conf.setDefaultValue()
 	common.Log.SetLogLevel(Conf.LogLevel)
 	Conf.Save()
 }
@@ -93,4 +98,15 @@ func (np *NetworkProxy) String() string {
 		return ""
 	}
 	return np.Scheme + "://" + np.Host + ":" + np.Port
+}
+
+func (conf *AppConf) setDefaultValue() {
+	if conf.SSL {
+		if conf.CertFileName == "" {
+			conf.CertFileName = "cert.pem"
+		}
+		if conf.CertKeyFileName == "" {
+			conf.CertKeyFileName = "key.pem"
+		}
+	}
 }

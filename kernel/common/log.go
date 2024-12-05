@@ -19,6 +19,8 @@ const (
 	ExitCodeWorkspaceLocked  = 24 // 工作空间已被锁定
 	ExitCodeInitWorkspaceErr = 25 // 初始化工作空间失败
 	ExitCodeFileSysErr       = 26 // 文件系统错误
+	ExitCodeCertificateErr   = 26 // 生成证书错误
+	ExitCodeUnsafe           = 26 // 由于不安全退出
 	ExitCodeOk               = 0  // 正常退出
 	ExitCodeFatal            = 1  // 致命错误
 )

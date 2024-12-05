@@ -11,7 +11,6 @@ import (
 	"kernel/middlewares"
 	"net"
 	"net/http"
-	"net/url"
 	"os"
 	"time"
 )
@@ -36,6 +35,9 @@ func Start() {
 
 	var host string
 	if conf.Conf.NetworkServe {
+		if !conf.Conf.SSL {
+			common.Log.Fatal(common.ExitCodeUnsafe, "network proxy is enabled, but ssl is disabled, this was unsafe, please enable ssl!")
+		}
 		host = "0.0.0.0"
 	} else {
 		host = "127.0.0.1"
@@ -51,11 +53,6 @@ func Start() {
 		common.Log.Error("boot kernel failed: %s", err)
 	}
 	conf.ServerPort = port
-
-	conf.ServerURL, err = url.Parse("http://127.0.0.1:" + port)
-	if err != nil {
-		common.Log.Error("parse server url failed: %s", err)
-	}
 
 	pid := fmt.Sprintf("%d", os.Getpid())
 	common.Log.Info("kernel [pid=%s] http server [%s] is booting", pid, host+":"+port)
@@ -76,9 +73,18 @@ func Start() {
 	}
 
 	go func() {
-		if err = conf.Server.Serve(ln); nil != err && !errors.Is(http.ErrServerClosed, err) {
-			conf.ServerIsRunning = false
-			common.Log.Fatal(common.ExitCodeUnavailablePort, "boot kernel failed: %s", err)
+		if conf.Conf.SSL {
+			certFileName, certKeyFileName := conf.InitCertificate()
+			common.Log.Info("Use certificate and key [%s] [%s]", certFileName, certKeyFileName)
+			if err = conf.Server.ServeTLS(ln, certFileName, certKeyFileName); nil != err && !errors.Is(http.ErrServerClosed, err) {
+				conf.ServerIsRunning = false
+				common.Log.Fatal(common.ExitCodeUnavailablePort, "boot kernel failed: %s", err)
+			}
+		} else {
+			if err = conf.Server.Serve(ln); nil != err && !errors.Is(http.ErrServerClosed, err) {
+				conf.ServerIsRunning = false
+				common.Log.Fatal(common.ExitCodeUnavailablePort, "boot kernel failed: %s", err)
+			}
 		}
 	}()
 

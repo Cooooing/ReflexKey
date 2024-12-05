@@ -6,7 +6,6 @@ import (
 	"github.com/gofrs/flock"
 	"kernel/common"
 	"net/http"
-	"net/url"
 	"os"
 	"path/filepath"
 	"runtime"
@@ -18,7 +17,6 @@ var Mode = Dev
 //var Mode = conf.Prod
 
 var (
-	ServerURL       *url.URL     // 内核服务 URL
 	ServerPort      = "0"        // HTTP/WebSocket 端口，0 为使用随机端口
 	ServerIsRunning = false      // 服务是否正在运行
 	Server          *http.Server // HTTP 服务器
@@ -55,13 +53,12 @@ var (
 	WorkspaceDir  = filepath.Join(WorkingDir, Workspace) // 工作空间目录路径
 	WorkspaceLock *flock.Flock                           // 工作空间锁
 	DataDir       string                                 // 数据目录路径
+	CertDir       string                                 // 证书目录路径
 	TempDir       string                                 // 临时目录路径
 	LogPath       string                                 // 配置目录下的日志文件 ReflexKey.log 路径
 	DBName        = "ReflexKey.db"                       // SQLite 数据库文件名
 	DBPath        string                                 // SQLite 数据库文件路径
 	ConfigPath    string                                 // 配置文件路径
-
-	SSL bool
 )
 
 func Boot() {
@@ -70,7 +67,6 @@ func Boot() {
 	port := flag.String("port", FixedPort, "port of the HTTP server")
 	readOnly := flag.String("readonly", "false", "read-only mode")
 	accessAuthCode := flag.String("accessAuthCode", "", "access auth code")
-	ssl := flag.Bool("ssl", false, "for https and wss")
 	lang := flag.String("lang", "zh_CN", "zh_CN/zh_CHT/en_US/fr_FR/es_ES/ja_JP")
 	mode := flag.String("mode", "dev", "dev/prod")
 	flag.Parse()
@@ -85,8 +81,6 @@ func Boot() {
 
 	initWorkspaceDir(*workspacePath)
 
-	SSL = *ssl
-
 	// 工作空间仅允许被一个内核进程伺服
 	tryLockWorkspace()
 
@@ -98,6 +92,7 @@ func Boot() {
 func initWorkspaceDir(workspaceArg string) {
 	WorkspaceDir = workspaceArg
 	DataDir = filepath.Join(WorkspaceDir, "data")
+	CertDir = filepath.Join(WorkspaceDir, "cert")
 	TempDir = filepath.Join(WorkspaceDir, "temp")
 	LogPath = filepath.Join(TempDir, "log", "ReflexKey.log")
 	DBPath = filepath.Join(DataDir, DBName)
@@ -114,6 +109,9 @@ func initWorkspaceDir(workspaceArg string) {
 
 	if err := os.MkdirAll(DataDir, 0755); nil != err && !os.IsExist(err) {
 		common.Log.Fatal(common.ExitCodeInitWorkspaceErr, "create data folder [%s] failed: %s", DataDir, err)
+	}
+	if err := os.MkdirAll(CertDir, 0755); nil != err && !os.IsExist(err) {
+		common.Log.Fatal(common.ExitCodeInitWorkspaceErr, "create data folder [%s] failed: %s", CertDir, err)
 	}
 	if err := os.MkdirAll(TempDir, 0755); nil != err && !os.IsExist(err) {
 		common.Log.Fatal(common.ExitCodeInitWorkspaceErr, "create temp folder [%s] failed: %s", TempDir, err)
