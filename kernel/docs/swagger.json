@@ -1,0 +1,304 @@
+{
+    "swagger": "2.0",
+    "info": {
+        "description": "This is ReflexKey‘s backend server.",
+        "title": "ReflexKey",
+        "contact": {},
+        "version": "0.0.1"
+    },
+    "basePath": "/api",
+    "paths": {
+        "/crypto/aesDecrypt": {
+            "post": {
+                "tags": [
+                    "crypto"
+                ],
+                "summary": "aes解密",
+                "parameters": [
+                    {
+                        "description": "AesDecryptParam",
+                        "name": "AesDecryptParam",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/param.AesDecryptParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Result"
+                        }
+                    }
+                }
+            }
+        },
+        "/crypto/aesEncrypt": {
+            "post": {
+                "tags": [
+                    "crypto"
+                ],
+                "summary": "aes加密",
+                "parameters": [
+                    {
+                        "description": "AesEncryptParam",
+                        "name": "AesEncryptParam",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/param.AesEncryptParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Result"
+                        }
+                    }
+                }
+            }
+        },
+        "/crypto/bcryptCompare": {
+            "post": {
+                "tags": [
+                    "crypto"
+                ],
+                "summary": "bcrypt对比",
+                "parameters": [
+                    {
+                        "description": "BcryptCompareParam",
+                        "name": "BcryptCompareParam",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/param.BcryptCompareParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Result"
+                        }
+                    }
+                }
+            }
+        },
+        "/crypto/bcryptCost": {
+            "post": {
+                "tags": [
+                    "crypto"
+                ],
+                "summary": "bcrypt获取cost",
+                "parameters": [
+                    {
+                        "description": "BcryptCostParam",
+                        "name": "BcryptCostParam",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/param.BcryptCostParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Result"
+                        }
+                    }
+                }
+            }
+        },
+        "/crypto/bcryptHash": {
+            "post": {
+                "tags": [
+                    "crypto"
+                ],
+                "summary": "bcrypt加密",
+                "parameters": [
+                    {
+                        "description": "BcryptHashParam",
+                        "name": "BcryptHashParam",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "$ref": "#/definitions/param.BcryptHashParam"
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": {
+                        "description": "OK",
+                        "schema": {
+                            "$ref": "#/definitions/model.Result"
+                        }
+                    }
+                }
+            }
+        },
+        "/system/databaseVersion": {
+            "get": {
+                "tags": [
+                    "system"
+                ],
+                "summary": "获取数据库版本",
+                "responses": {}
+            }
+        },
+        "/system/ping": {
+            "get": {
+                "tags": [
+                    "system"
+                ],
+                "summary": "服务器状态",
+                "responses": {}
+            }
+        }
+    },
+    "definitions": {
+        "model.Result": {
+            "type": "object",
+            "properties": {
+                "code": {
+                    "description": "return code",
+                    "type": "integer"
+                },
+                "data": {
+                    "description": "data object"
+                },
+                "msg": {
+                    "description": "message",
+                    "type": "string"
+                },
+                "time": {
+                    "description": "time",
+                    "type": "string"
+                }
+            }
+        },
+        "param.AesDecryptParam": {
+            "type": "object",
+            "properties": {
+                "cipherText": {
+                    "description": "密文",
+                    "type": "string"
+                },
+                "cipherTextFormat": {
+                    "description": "密文格式",
+                    "type": "string"
+                },
+                "deviation": {
+                    "description": "偏移量",
+                    "type": "string"
+                },
+                "deviationFormat": {
+                    "description": "偏移量格式",
+                    "type": "string"
+                },
+                "fill": {
+                    "description": "填充模式",
+                    "type": "string"
+                },
+                "key": {
+                    "description": "密钥",
+                    "type": "string"
+                },
+                "keyFormat": {
+                    "description": "密钥格式",
+                    "type": "string"
+                },
+                "operationMode": {
+                    "description": "解密模式",
+                    "type": "string"
+                },
+                "plainTextFormat": {
+                    "description": "明文格式",
+                    "type": "string"
+                }
+            }
+        },
+        "param.AesEncryptParam": {
+            "type": "object",
+            "properties": {
+                "cipherTextFormat": {
+                    "description": "密文输出格式",
+                    "type": "string"
+                },
+                "deviation": {
+                    "description": "偏移量",
+                    "type": "string"
+                },
+                "deviationFormat": {
+                    "description": "偏移量格式",
+                    "type": "string"
+                },
+                "fill": {
+                    "description": "填充模式",
+                    "type": "string"
+                },
+                "key": {
+                    "description": "密钥",
+                    "type": "string"
+                },
+                "keyFormat": {
+                    "description": "密钥格式",
+                    "type": "string"
+                },
+                "operationMode": {
+                    "description": "加密模式",
+                    "type": "string"
+                },
+                "plainText": {
+                    "description": "明文",
+                    "type": "string"
+                },
+                "plainTextFormat": {
+                    "description": "明文格式",
+                    "type": "string"
+                }
+            }
+        },
+        "param.BcryptCompareParam": {
+            "type": "object",
+            "properties": {
+                "hashedPassword": {
+                    "description": "密文",
+                    "type": "string"
+                },
+                "password": {
+                    "description": "明文",
+                    "type": "string"
+                }
+            }
+        },
+        "param.BcryptCostParam": {
+            "type": "object",
+            "properties": {
+                "hashedPassword": {
+                    "description": "密文",
+                    "type": "string"
+                }
+            }
+        },
+        "param.BcryptHashParam": {
+            "type": "object",
+            "properties": {
+                "cost": {
+                    "description": "哈希成本",
+                    "type": "integer"
+                },
+                "password": {
+                    "description": "明文",
+                    "type": "string"
+                }
+            }
+        }
+    }
+}

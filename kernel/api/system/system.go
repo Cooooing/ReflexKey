@@ -29,8 +29,8 @@ func (system *SystemController) InitRoutes(ginServer *gin.Engine) {
 }
 
 func (system *SystemController) Routes(rg *gin.RouterGroup) {
-	rg.POST("/ping", system.ping)
-	rg.POST("/databaseVersion", system.databaseVersion)
+	rg.GET("/ping", system.ping)
+	rg.GET("/databaseVersion", system.databaseVersion)
 }
 
 func (system *SystemController) static(c *gin.Context) {
@@ -57,10 +57,18 @@ func (system *SystemController) noRoute(c *gin.Context) {
 	c.Redirect(http.StatusFound, "/")
 }
 
+// ShowAccount godoc
+//	@Summary	服务器状态
+//	@Tags		system
+//	@Router		/system/ping [get]
 func (system *SystemController) ping(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success("pong"))
 }
 
+// ShowAccount godoc
+//	@Summary	获取数据库版本
+//	@Tags		system
+//	@Router		/system/databaseVersion [get]
 func (system *SystemController) databaseVersion(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success(conf.DatabaseVersion))
 }

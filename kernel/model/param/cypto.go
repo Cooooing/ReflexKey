@@ -1,5 +1,6 @@
 package param
 
+// swagger:model
 type AesEncryptParam struct {
 	PlainText        string `json:"plainText"`        // 明文
 	PlainTextFormat  string `json:"plainTextFormat"`  // 明文格式
@@ -12,6 +13,7 @@ type AesEncryptParam struct {
 	CipherTextFormat string `json:"cipherTextFormat"` // 密文输出格式
 }
 
+// swagger:model
 type AesDecryptParam struct {
 	CipherText       string `json:"cipherText"`       // 密文
 	CipherTextFormat string `json:"cipherTextFormat"` // 密文格式
@@ -24,11 +26,13 @@ type AesDecryptParam struct {
 	PlainTextFormat  string `json:"plainTextFormat"`  // 明文格式
 }
 
+// swagger:model
 type BcryptHashParam struct {
 	Password string `json:"password"` // 明文
 	Cost     int    `json:"cost"`     // 哈希成本
 }
 
+// swagger:model
 type BcryptCompareParam struct {
 	HashedPassword string `json:"hashedPassword"` // 密文
 	Password       string `json:"password"`       // 明文

@@ -24,6 +24,12 @@ func (crypto *CryptoController) Routes(rg *gin.RouterGroup) {
 	rg.POST("/bcryptCost", crypto.bcryptCost)
 }
 
+// aesEncrypt godoc
+//	@Summary	aes加密
+//	@Tags		crypto
+//	@Param		AesEncryptParam	body		param.AesEncryptParam	true	"AesEncryptParam"
+//	@Success	200				{object}	model.Result
+//	@Router		/crypto/aesEncrypt [post]
 func (crypto *CryptoController) aesEncrypt(c *gin.Context) {
 	var (
 		params param.AesEncryptParam
@@ -47,6 +53,12 @@ func (crypto *CryptoController) aesEncrypt(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success(result))
 }
 
+// aesDecrypt godoc
+//	@Summary	aes解密
+//	@Tags		crypto
+//	@Param		AesDecryptParam	body		param.AesDecryptParam	true	"AesDecryptParam"
+//	@Success	200				{object}	model.Result
+//	@Router		/crypto/aesDecrypt [post]
 func (crypto *CryptoController) aesDecrypt(c *gin.Context) {
 	var (
 		params param.AesDecryptParam
@@ -70,6 +82,12 @@ func (crypto *CryptoController) aesDecrypt(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success(result))
 }
 
+// bcryptHash godoc
+//	@Summary	bcrypt加密
+//	@Tags		crypto
+//	@Param		BcryptHashParam	body		param.BcryptHashParam	true	"BcryptHashParam"
+//	@Success	200				{object}	model.Result
+//	@Router		/crypto/bcryptHash [post]
 func (crypto *CryptoController) bcryptHash(c *gin.Context) {
 	var (
 		params param.BcryptHashParam
@@ -93,6 +111,12 @@ func (crypto *CryptoController) bcryptHash(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success(result))
 }
 
+// bcryptCompare godoc
+//	@Summary	bcrypt对比
+//	@Tags		crypto
+//	@Param		BcryptCompareParam	body		param.BcryptCompareParam	true	"BcryptCompareParam"
+//	@Success	200					{object}	model.Result
+//	@Router		/crypto/bcryptCompare [post]
 func (crypto *CryptoController) bcryptCompare(c *gin.Context) {
 	var (
 		params param.BcryptCompareParam
@@ -116,6 +140,12 @@ func (crypto *CryptoController) bcryptCompare(c *gin.Context) {
 	c.JSON(http.StatusOK, model.Success(result))
 }
 
+// bcryptCost godoc
+//	@Summary	bcrypt获取cost
+//	@Tags		crypto
+//	@Param		BcryptCostParam	body		param.BcryptCostParam	true	"BcryptCostParam"
+//	@Success	200				{object}	model.Result
+//	@Router		/crypto/bcryptCost [post]
 func (crypto *CryptoController) bcryptCost(c *gin.Context) {
 	var (
 		params param.BcryptCostParam

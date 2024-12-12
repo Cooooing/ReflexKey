@@ -1,0 +1,204 @@
+basePath: /api
+definitions:
+  model.Result:
+    properties:
+      code:
+        description: return code
+        type: integer
+      data:
+        description: data object
+      msg:
+        description: message
+        type: string
+      time:
+        description: time
+        type: string
+    type: object
+  param.AesDecryptParam:
+    properties:
+      cipherText:
+        description: 密文
+        type: string
+      cipherTextFormat:
+        description: 密文格式
+        type: string
+      deviation:
+        description: 偏移量
+        type: string
+      deviationFormat:
+        description: 偏移量格式
+        type: string
+      fill:
+        description: 填充模式
+        type: string
+      key:
+        description: 密钥
+        type: string
+      keyFormat:
+        description: 密钥格式
+        type: string
+      operationMode:
+        description: 解密模式
+        type: string
+      plainTextFormat:
+        description: 明文格式
+        type: string
+    type: object
+  param.AesEncryptParam:
+    properties:
+      cipherTextFormat:
+        description: 密文输出格式
+        type: string
+      deviation:
+        description: 偏移量
+        type: string
+      deviationFormat:
+        description: 偏移量格式
+        type: string
+      fill:
+        description: 填充模式
+        type: string
+      key:
+        description: 密钥
+        type: string
+      keyFormat:
+        description: 密钥格式
+        type: string
+      operationMode:
+        description: 加密模式
+        type: string
+      plainText:
+        description: 明文
+        type: string
+      plainTextFormat:
+        description: 明文格式
+        type: string
+    type: object
+  param.BcryptCompareParam:
+    properties:
+      hashedPassword:
+        description: 密文
+        type: string
+      password:
+        description: 明文
+        type: string
+    type: object
+  param.BcryptCostParam:
+    properties:
+      hashedPassword:
+        description: 密文
+        type: string
+    type: object
+  param.BcryptHashParam:
+    properties:
+      cost:
+        description: 哈希成本
+        type: integer
+      password:
+        description: 明文
+        type: string
+    type: object
+info:
+  contact: {}
+  description: This is ReflexKey‘s backend server.
+  title: ReflexKey
+  version: 0.0.1
+paths:
+  /crypto/aesDecrypt:
+    post:
+      parameters:
+      - description: AesDecryptParam
+        in: body
+        name: AesDecryptParam
+        required: true
+        schema:
+          $ref: '#/definitions/param.AesDecryptParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Result'
+      summary: aes解密
+      tags:
+      - crypto
+  /crypto/aesEncrypt:
+    post:
+      parameters:
+      - description: AesEncryptParam
+        in: body
+        name: AesEncryptParam
+        required: true
+        schema:
+          $ref: '#/definitions/param.AesEncryptParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Result'
+      summary: aes加密
+      tags:
+      - crypto
+  /crypto/bcryptCompare:
+    post:
+      parameters:
+      - description: BcryptCompareParam
+        in: body
+        name: BcryptCompareParam
+        required: true
+        schema:
+          $ref: '#/definitions/param.BcryptCompareParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Result'
+      summary: bcrypt对比
+      tags:
+      - crypto
+  /crypto/bcryptCost:
+    post:
+      parameters:
+      - description: BcryptCostParam
+        in: body
+        name: BcryptCostParam
+        required: true
+        schema:
+          $ref: '#/definitions/param.BcryptCostParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Result'
+      summary: bcrypt获取cost
+      tags:
+      - crypto
+  /crypto/bcryptHash:
+    post:
+      parameters:
+      - description: BcryptHashParam
+        in: body
+        name: BcryptHashParam
+        required: true
+        schema:
+          $ref: '#/definitions/param.BcryptHashParam'
+      responses:
+        "200":
+          description: OK
+          schema:
+            $ref: '#/definitions/model.Result'
+      summary: bcrypt加密
+      tags:
+      - crypto
+  /system/databaseVersion:
+    get:
+      responses: {}
+      summary: 获取数据库版本
+      tags:
+      - system
+  /system/ping:
+    get:
+      responses: {}
+      summary: 服务器状态
+      tags:
+      - system
+swagger: "2.0"

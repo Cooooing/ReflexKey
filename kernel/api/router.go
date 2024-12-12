@@ -2,9 +2,12 @@ package api
 
 import (
 	"github.com/gin-gonic/gin"
+	swaggerFiles "github.com/swaggo/files"
+	ginSwagger "github.com/swaggo/gin-swagger"
 	"kernel/api/system"
 	"kernel/api/tool"
 	"kernel/conf"
+	_ "kernel/docs"
 	"net/http/pprof"
 )
 
@@ -21,11 +24,13 @@ func ServeAPI(ginServer *gin.Engine) {
 		{
 			systemController.Routes(systemGroup)
 		}
-		tools := api.Group("/tools")
+		tools := api.Group("/tool")
 		{
 			tool.NewEncodingController().Routes(tools.Group("/encoding"))
 			tool.NewCryptoController().Routes(tools.Group("/crypto"))
 		}
+
+		api.GET("/swagger/*any", ginSwagger.WrapHandler(swaggerFiles.Handler))
 	}
 
 	// serveDebug 生产模式下关闭 pprof

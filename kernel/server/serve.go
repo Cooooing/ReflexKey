@@ -15,6 +15,11 @@ import (
 	"time"
 )
 
+// Start Gin Server Start
+//	@title			ReflexKey
+//	@version		0.0.1
+//	@description	This is ReflexKey‘s backend server.
+//	@basePath		/api
 func Start() {
 	if conf.ServerIsRunning {
 		return
